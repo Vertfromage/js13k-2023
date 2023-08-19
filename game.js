@@ -13,8 +13,16 @@ var gameOver=mobile=false
 
 // steps on the journey
 const steps = [
-  { start: { x: 50, y: 50 }, end: { x: 300, y: 300 }, percentage: 0 },
-  { start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
+  { name: 'Constantinople / Istanbul', country:'Turkey', desc: "Vibrant markets and goods from East and West set the journey's tone.", start: { x: 50, y: 50 }, end: { x: 300, y: 300 }, percentage: 0},
+  { name: 'Ankara', country:'Turkey', desc: "Capital's grand bazaar restocks supplies, shares Silk Road tales.", start: { x: 50, y: 50 }, end: { x: 300, y: 300 }, percentage: 0 },
+  { name: 'Tabriz', country:'Iran', desc: "Caravanserais host distant merchants, reveal culture in gardens.", start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
+  { name: 'Isfahan', country:'Iran', desc: "Thriving trade, splendid mosques, and artistry discussions.", start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
+  { name: 'Samarkand', country:'Uzbekistan', desc: "Turquoise domes, textiles, history in bustling markets.", start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
+  { name: 'Bukhara', country:'Uzbekistan', desc: "Ancient walls, diverse culture, legendary caravans.", start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
+  { name: 'Tashkent', country:'Uzbekistan', desc: "Cosmopolitan unity, ideas, and exotic goods.", start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
+  { name: 'Kashgar', country:'China', desc: "Colorful bazaars, Silk Road's influence in local life.", start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
+  { name: 'Dunhuang', country:'China', desc: "Gateway to East, Mogao Caves' spiritual convergence.", start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
+  { name: "Xi'an", country:'China', desc: "East-West harmony, imperial legacy, new beginnings.", start: { x: 100, y: 200 }, end: { x: 250, y: 100 }, percentage: 0 },
   // Add more steps here
 ];
 
