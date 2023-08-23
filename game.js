@@ -17,6 +17,17 @@ const svg =["m -10.389267,104.73924 5.8771626,7.44441 L 64.446638,84.756881 196.
 const dots = []
 const playerData = {
   members : [],
+  money: 1000,
+  supplies : {
+    Camels: {val:0, cost:100},
+    CamelFeed: {val:0, cost:10},
+    Food: {val:0, cost:20},
+    Clothing: {val:0, cost:50},
+    WaterSkins: {val:0, cost:5},
+    TradeGoods: {val:0, cost:50}, 
+    Arrows: {val:0, cost:5},
+    Tents: {val:0, cost:50}
+  }
 }
 
 const lastPathSVG = svg[svg.length - 1];
@@ -24,7 +35,6 @@ var temp = {x: 0, y:0}
 lastPathSVG.split(" ").map((cor)=>{
     if(cor!=='m'){
         var parts = cor.split(",")
-        console.log(parts[0], parts[1])
         temp = {x: temp.x+parseFloat(parts[0]), y: temp.y+parseFloat(parts[1])}
         dots.push({x: temp.x, y: temp.y})
     }
@@ -63,8 +73,8 @@ class Button {
   }
 
   draw() {
-    c.fillStyle = this.isClicked ? "GoldenRod" : "DarkGoldenRod";
-
+    //c.fillStyle = this.isClicked ? "GoldenRod" : "DarkGoldenRod";
+    c.fillStyle = "GoldenRod"
     c.shadowColor = "rgba(0, 0, 0, 0.3)"
     c.shadowBlur = 6
     c.shadowOffsetX = 3
@@ -97,7 +107,6 @@ const buttons = [
       // temporary remove!
       if(steps[0].percentage<1){
         steps[0].percentage+=.05
-        console.log( steps[0].percentage)
       }
     }),
     new Button(c.w*.45, c.h*.6, 120, 50, "Add Member!", 2, ()=>{
@@ -109,6 +118,30 @@ const buttons = [
       }
     }),
   ]
+var H=c.h*.22
+for(item in playerData.supplies){
+  buttons.push(
+    new Button(c.w * 0.70, H, 60, 30, "+", 3, (() => {
+      const currentItem = item;
+      return () => {
+        if(playerData.money - playerData.supplies[currentItem].cost >=0){
+          playerData.money -= playerData.supplies[currentItem].cost
+          playerData.supplies[currentItem].val+=playerData.supplies[currentItem].cost
+        }
+      };
+    })()),
+    new Button(c.w * 0.78, H, 60, 30, "-", 3, (() => {
+      const currentItem = item;
+      return () => {
+        if(playerData.supplies[currentItem].val >0){
+          playerData.money += playerData.supplies[currentItem].cost
+          playerData.supplies[currentItem].val-=playerData.supplies[currentItem].cost
+        }
+      };
+    })())
+  )
+  H+=c.h*.06
+}
 
 const inputView = () =>{
   if(txtInput.style.display === "block"){
@@ -164,6 +197,22 @@ function setup(){
 
 function shop(){
   tx("Shop", c.w / 2, c.h * .1, 5.3, '#E35A31')
+  H=c.h*.19
+  sum = 0
+  tx("Item", c.w*.2, H, 4,'DarkSlateGrey')
+  tx("Num", c.w*.35, H, 4,'DarkSlateGrey')
+  tx("Cost", c.w*.5, H, 4, 'DarkSlateGrey')
+  H+=c.h*.06
+for(item in playerData.supplies){
+  tx(item, c.w*.2, H, 3, '#E35A31')
+  tx(playerData.supplies[item].val/playerData.supplies[item].cost, c.w*.35, H, 3, 'DarkSlateGrey')
+  tx(playerData.supplies[item].val, c.w*.5, H, 3, 'DarkSlateGrey')
+  H+=c.h*.06
+  sum+=playerData.supplies[item].val
+}
+tx("Total "+sum+"$", c.w*.5, H, 3, 'DarkSlateGrey')
+H+=c.h*.05
+tx("You have "+playerData.money+"$", c.w*.5, H, 3, 'DarkSlateGrey')
 }
 
 function map(){
