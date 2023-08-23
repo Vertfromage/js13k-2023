@@ -27,6 +27,10 @@ const playerData = {
     TradeGoods: {val:0, cost:50}, 
     Arrows: {val:0, cost:5},
     Tents: {val:0, cost:50}
+  },
+  settings : {
+    pace: "steady",
+    rations: "good"
   }
 }
 
@@ -100,8 +104,7 @@ class Button {
 
 const buttons = [
     new Button(c.w*.45, c.h*.6, 100, 50, "Start!", 0, ()=>{
-      //s=2, inputView(), changeText("Input your caravan member's names!")
-      s=3, changeText("Buy Supplies for the journey ahead!")
+      s=2, inputView(), changeText("Input your caravan member's names!")
     }),
     new Button(c.w*.45, c.h*.7, 100, 50, "Button 2", 1, ()=>{
       // temporary remove!
@@ -110,18 +113,20 @@ const buttons = [
       }
     }),
     new Button(c.w*.45, c.h*.6, 120, 50, "Add Member!", 2, ()=>{
+      if(txtInput.value.length>0){
       playerData.members.push(txtInput.value)
       txtInput.value = ""
       changeText("Caravan Members: "+playerData.members.toString())
       if(playerData.members.length==5){
         s=3, inputView(), changeText("Buy Supplies for the journey ahead!")
       }
+    }
     }),
   ]
 var H=c.h*.22
 for(item in playerData.supplies){
   buttons.push(
-    new Button(c.w * 0.70, H, 60, 30, "+", 3, (() => {
+    new Button(c.w * 0.7, H, 60, 30, "+", 3, (() => {
       const currentItem = item;
       return () => {
         if(playerData.money - playerData.supplies[currentItem].cost >=0){
@@ -142,6 +147,9 @@ for(item in playerData.supplies){
   )
   H+=c.h*.06
 }
+buttons.push(new Button(c.w*.7, H, 150, 50, "Done!", 3, ()=>{
+  s=1
+}))
 
 const inputView = () =>{
   if(txtInput.style.display === "block"){
@@ -195,6 +203,7 @@ function setup(){
   tx("Members of Caravan?", c.w / 2, c.h * .34, 5.3, '#E35A31')
 }
 
+// might need to modify if price goes up and down along the way... 
 function shop(){
   tx("Shop", c.w / 2, c.h * .1, 5.3, '#E35A31')
   H=c.h*.19
