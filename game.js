@@ -104,7 +104,7 @@ class Button {
 
 const buttons = [
     new Button(c.w*.45, c.h*.6, 100, 50, "Start!", 0, ()=>{
-      s=2, inputView(), changeText("Input your caravan member's names!")
+      s=2, inputView(true), changeText("Input your caravan member's names!")
     }),
     new Button(c.w*.45, c.h*.7, 100, 50, "Button 2", 1, ()=>{
       // temporary remove!
@@ -118,7 +118,7 @@ const buttons = [
       txtInput.value = ""
       changeText("Caravan Members: "+playerData.members.toString())
       if(playerData.members.length==5){
-        s=3, inputView(), changeText("Buy Supplies for the journey ahead!")
+        s=3, inputView(false), changeText("Buy Supplies for the journey ahead!")
       }
     }
     }),
@@ -151,12 +151,8 @@ buttons.push(new Button(c.w*.7, H, 150, 50, "Done!", 3, ()=>{
   s=1
 }))
 
-const inputView = () =>{
-  if(txtInput.style.display === "block"){
-    txtInput.style.display = "none"
-  }else{
-    txtInput.style.display = "block"
-  }
+const inputView = (show) =>{
+  txtInput.style.display = show ? "block" : "none";
 }
 
 
@@ -312,7 +308,6 @@ function drawButtons() {
   }
 
 function toggleTextContainer(show) {
-    const textContainer = document.getElementById("textContainer");
     textContainer.style.display = show ? "block" : "none";
 }
 
