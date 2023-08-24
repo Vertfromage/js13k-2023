@@ -88,7 +88,7 @@ class Button {
     drawRoundedRect(c, this.x, this.y, this.width, this.height)
 
     c.fillStyle = "DarkSlateGrey"
-    c.font = "4vw Arial"
+    c.font = "3.6vw Consolas"
     c.textAlign = "center"
     c.textBaseline = "middle"
     c.fillText(this.label, this.x + this.width / 2, this.y + this.height / 2)
@@ -99,77 +99,82 @@ class Button {
     c.shadowOffsetY = 0
 }
 }
-var bW = 200
-var bH = 60
-const buttons = [
-    new Button(c.w*.4, c.h*.6, bW, bH, "Start!", 0, ()=>{
-      //s=2, inputView(true), changeText("Input your caravan member's names!")
-      s=1
-    }),
-    new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 1, ()=>{
-      // // temporary remove! Testing movement along map
-      // if(steps[0].percentage<1){
-      //   steps[0].percentage+=.05
-      // }
-      s=4
-    }),
-    new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 5, ()=>{
-      s=4
-    }),
-    new Button(c.w*.4, c.h*.6, bW, bH, "Add Member!", 2, ()=>{
-      if(txtInput.value.length>0){
-      playerData.members.push(txtInput.value)
-      txtInput.value = ""
-      changeText("Caravan Members: "+playerData.members.toString())
-      if(playerData.members.length==5){
-        s=3, inputView(false), changeText("Buy Supplies for the journey ahead!")
-      }
-    }
-    }),
-    new Button(c.w*.7, 0, bW, bH, "Big Map!", 4, ()=>{
-      s=1
-    }),
-    new Button(c.w*.7, c.h*.1, bW, bH, "Shop!", 4, ()=>{
-      if(state==='city'){s=3}else{
-        alert("Can only visit shop in city!")
-      }
-    }),
-    new Button(c.w*.16, 0, bW, bH, "Hunt!", 4, ()=>{
-      if(state!=='city'){s=5}else{
-        alert("Too many people around!")
-      }
-    }),
-    new Button(c.w*.16, c.h*.1, bW, bH, "Button 2!", 4, ()=>{
-      
-    })
-  ]
-var H=c.h*.22
-for(item in playerData.supplies){
-  buttons.push(
-    new Button(c.w * 0.7, H, 60, 30, "+", 3, (() => {
-      const currentItem = item;
-      return () => {
-        if(playerData.money - playerData.supplies[currentItem].cost >=0){
-          playerData.money -= playerData.supplies[currentItem].cost
-          playerData.supplies[currentItem].val+=playerData.supplies[currentItem].cost
+
+const buttons = []
+
+function setButtons(){
+  var bW = 200
+  var bH = 60
+  var mapH = mobile ? c.h*.25+5 : c.h/3+5
+  buttons.push(new Button(c.w*.4, c.h*.6, bW, bH, "Start!", 0, ()=>{
+        //s=2, inputView(true), changeText("Input your caravan member's names!")
+        s=1
+      }),
+      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 1, ()=>{
+        // // temporary remove! Testing movement along map
+        // if(steps[0].percentage<1){
+        //   steps[0].percentage+=.05
+        // }
+        s=4
+      }),
+      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 5, ()=>{
+        s=4
+      }),
+      new Button(c.w*.4, c.h*.6, bW, bH, "Add Member!", 2, ()=>{
+        if(txtInput.value.length>0){
+        playerData.members.push(txtInput.value)
+        txtInput.value = ""
+        changeText("Caravan Members: "+playerData.members.toString())
+        if(playerData.members.length==5){
+          s=3, inputView(false), changeText("Buy Supplies for the journey ahead!")
         }
-      };
-    })()),
-    new Button(c.w * 0.78, H, 60, 30, "-", 3, (() => {
-      const currentItem = item;
-      return () => {
-        if(playerData.supplies[currentItem].val >0){
-          playerData.money += playerData.supplies[currentItem].cost
-          playerData.supplies[currentItem].val-=playerData.supplies[currentItem].cost
+      }
+      }),
+      new Button(c.w*.5+2, mapH, bW, bH, "Big Map!", 4, ()=>{
+        s=1
+      }),
+      new Button(c.w*.5+2, mapH+bH+5, bW, bH, "Shop!", 4, ()=>{
+        if(state==='city'){s=3}else{
+          alert("Can only visit shop in city!")
         }
-      };
-    })())
-  )
-  H+=c.h*.06
+      }),
+      new Button(c.w*.5-bW-2, mapH, bW, bH, "Hunt!", 4, ()=>{
+        if(state!=='city'){s=5}else{
+          alert("Too many people around!")
+        }
+      }),
+      new Button(c.w*.5-bW-2, mapH+bH+5, bW, bH, "Testing!", 4, ()=>{
+        
+      }))
+  var H=c.h*.22
+  for(item in playerData.supplies){
+    buttons.push(
+      new Button(c.w * 0.7, H, 60, 30, "+", 3, (() => {
+        const currentItem = item;
+        return () => {
+          if(playerData.money - playerData.supplies[currentItem].cost >=0){
+            playerData.money -= playerData.supplies[currentItem].cost
+            playerData.supplies[currentItem].val+=playerData.supplies[currentItem].cost
+          }
+        };
+      })()),
+      new Button(c.w * 0.78, H, 60, 30, "-", 3, (() => {
+        const currentItem = item;
+        return () => {
+          if(playerData.supplies[currentItem].val >0){
+            playerData.money += playerData.supplies[currentItem].cost
+            playerData.supplies[currentItem].val-=playerData.supplies[currentItem].cost
+          }
+        };
+      })())
+    )
+    H+=c.h*.06
+  }
+  buttons.push(new Button(c.w*.7, H, bW, bH, "Done!", 3, ()=>{
+    s=4
+  }))
 }
-buttons.push(new Button(c.w*.7, H, bW, bH, "Done!", 3, ()=>{
-  s=4
-}))
+setButtons()
 
 const inputView = (show) =>{
   txtInput.style.display = show ? "block" : "none";
@@ -308,8 +313,13 @@ start()
 
 /** UTILS */
 function resize(){
-//TODO Resize function
+  mobile = window.screen.width < 750
+  c.w = innerWidth
+  c.h = innerHeight
+  buttons.length=0
+  setButtons()
 }
+window.addEventListener('resize', resize);
 
 
 function start() {
@@ -373,10 +383,6 @@ function drawPercentOfLine( x1, y1, x2, y2, percentage) {
   c.lineTo(interpolated_x, interpolated_y)
   c.stroke()
   c.lineWidth=1
-}
-
-const isMobile = () =>{
-  return (window.screen.width < 768 || window.screen.height < 768)
 }
 
 // might need for archery game
