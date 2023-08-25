@@ -9,13 +9,12 @@
 [] Trade *
 [] Talk
 [] Choose profession
-[] Traveling caravan animation
-
 
 
 <!-- Hard -->
 [] Hunting mini game
 [] Raiders mini game
-[] Mobile Friendly
+[x] Mobile Friendly
 [] Music
 [] Decentralized (Score? Wiki?)
+[] Traveling caravan animation
