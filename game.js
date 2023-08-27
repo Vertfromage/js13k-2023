@@ -115,7 +115,10 @@ function setButtons(){
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
         //s=2, inputView(true), changeText("Input your caravan member's names!")
         //s=4, changeText("Control your journey by making wise decisions!")
-        s=6, changeText(steps[curStep].desc), state="city"
+        s=6, changeText(steps[curStep].desc), state="city", p0`240
+c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
+J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|
+`
       }),
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 1, ()=>{
         // // temporary remove! Testing movement along map
