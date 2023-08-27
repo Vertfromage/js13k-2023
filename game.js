@@ -20,6 +20,7 @@ var txScale = mobile ? 1.4 : 1
 const playerData = {
   members : [],
   money: 1000,
+  hunt:0,
   supplies : {
     Camels: {val:0, cost:100},
     CamelFeed: {val:0, cost:10},
@@ -35,6 +36,7 @@ const playerData = {
     rations: "good"
   }
 }
+const mouse = {x:0, y:0}
 
 const lastPathSVG = svg[svg.length - 1];
 var temp = {x: 0, y:0}
@@ -45,7 +47,7 @@ lastPathSVG.split(" ").map((cor)=>{
         dots.push({x: temp.x, y: temp.y})
     }
 })
-
+var curStep = 0
 const steps = [
   { name: 'Vanice', country:'Italy', desc: "Venice thrived as a trading hub and cultural center.", start: dots[0], end: dots[1], percentage: .50},
   { name: 'Acre', country:'Israel', desc: "Bustling port city that was a focal point of trade and cultural exchange.", start: dots[1], end: dots[2], percentage: 0 },
@@ -107,9 +109,13 @@ function setButtons(){
   var bW = mobile ? 250 : 200
   var bH = mobile ? 70 : 60
   var mapH = (mobile ? c.h*.28+5 : c.h/3+5)+90
-  buttons.push(new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
+  var bCen = c.w*.5-bW*.5
+  buttons.push(
+    // first screen button
+    new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
         //s=2, inputView(true), changeText("Input your caravan member's names!")
-        s=4, changeText("Control your journey by making wise decisions!")
+        //s=4, changeText("Control your journey by making wise decisions!")
+        s=6, changeText(steps[curStep].desc), state="city"
       }),
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 1, ()=>{
         // // temporary remove! Testing movement along map
@@ -119,6 +125,7 @@ function setButtons(){
         s=4
       }),
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 5, ()=>{
+        playerData.supplies.Food.val+= playerData.hunt<200 ? playerData.hunt : 200
         s=4
       }),
       new Button(c.w*.4, c.h*.6, bW, bH, "Add Member!", 2, ()=>{
@@ -134,8 +141,19 @@ function setButtons(){
       new Button(c.w*.5-bW*1.5-2, mapH, bW, bH, "Status!", 4, ()=>{
         
       }),
-      new Button(c.w*.5-bW*.5, mapH, bW, bH, "Hunt!", 4, ()=>{
-        if(state!=='city'){s=5}else{
+      new Button(bCen, mapH, bW, bH, "Hunt!", 4, ()=>{
+        if(state!=='city'){
+          for(an of animalArr){
+            an.v = Math.floor((Math.random() * 2))
+            an.alive = true
+            an.x = c.w*.2+Math.random()*c.w*.7
+            an.y = c.h*.1+Math.random()*c.h*.6
+            an.s= 1+Math.random() * 3
+          }
+          playerData.hunt=0
+          changeText("You can only carry 200lbs! Use as few arrows as possible!")
+          s=5
+        }else{
           alert("Too many people around!")
         }
       }),
@@ -145,7 +163,7 @@ function setButtons(){
       new Button(c.w*.5-bW*1.5-2, mapH+bH+5, bW, bH, "Interact!", 4, ()=>{
         // talk or trade
       }),      
-      new Button(c.w*.5-bW*.5, mapH+bH+5, bW, bH, "Continue", 4, ()=>{
+      new Button(bCen, mapH+bH+5, bW, bH, "Continue", 4, ()=>{
         buttons[8].label=(buttons[8].label ==="Rest")? "Continue":"Rest"
         state=(buttons[8].label ==="Rest")? "Rest":"Moving"
       }),
@@ -154,7 +172,15 @@ function setButtons(){
           alert("Can only visit shop in city!")
         }
       }),
-      
+      new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Shop!", 4, ()=>{
+        if(state==='city'){s=3}else{
+          alert("Can only visit shop in city!")
+        }
+      }),
+      new Button(bCen, c.h/2, bW, bH, "Continue!", 6, ()=>{
+        s=4, changeText("Control your journey by making wise decisions!")
+      })
+
       )
   var H=c.h*.22
   for(item in playerData.supplies){
@@ -222,11 +248,18 @@ function smoothAnimation(e) {
 // ex: "game over if we click on the bottom half of the screen" => `if(y>h/2)s=3;`
 onclick = e => {
     x = e.pageX; y = e.pageY
-    handleButtonClick(x,y,s)
     switch (s) {
         case 0: 
-            break;
+          break;
+        case 5:
+          if(arrow.set&&playerData.supplies.Arrows.val>0){
+            arrow.x= rope.x,arrow.y=arc.y-3
+            arrow.set = false
+            playerData.supplies.Arrows.val--
+          }
+          break;
     }
+    handleButtonClick(x,y,s)
 }
 
 function title() {
@@ -270,20 +303,128 @@ function statusText(){
   tx("Traveled: "+totalTraveled, c.w *.8, c.h*.2+mob, 3, 'DarkSlateGrey')
 }
 
+function city(){
+  tx(steps[curStep].name, c.w / 2, c.h * .34, 6, '#E35A31')
+  tx(steps[curStep].country, c.w / 2, c.h * .44, 4, '#E35A31')
+  // TODO: Image representing city - could be decentralized add on
+}
+
 function moving(){
-  // ToDo: everything that happens when not stopped at a city
+  // TODO: everything that happens when not stopped at a city
 }
 
 function hunt(){
+  let arrows = playerData.supplies.Arrows.val
   tx("Hunting", c.w / 2, c.h * .34, 5.3, '#E35A31')
+  tx("Arrows: "+arrows, c.w / 2, c.h *.45, 3, '#E35A31')
+  tx("Killed: "+playerData.hunt+" lbs", c.w / 2, c.h *.55, 3, '#E35A31')
+  if(arrows>0){
+    bow()
+  }
+  animals()
+
+}
+
+var animalArr = [{t:"🐪", v:0, w:990},{t:"🐏", v:0, w:99},{t:"🦌", v:0, w:150,s:3}, {t:"🐇", v:0, w:11}]
+
+function animals(){
+  for(an of animalArr){
+    if(an.v&& an.alive){
+      tx(an.t, an.x, an.y, 5.3, '#E35A31')
+      an.y+=an.s
+      if(an.y<10||an.y>c.h*.9){
+        an.s*=-1
+      }
+      if(touch(an.x,an.y,arrow.x+arrow.w,arrow.y, 25)){
+        playerData.hunt+=an.w
+        an.alive=false
+      }
+    }
+  }
+}
+
+function bow(){
+  //bow 
+  c.beginPath();
+  c.arc(arc.x,arc.y,arc.r,arc.start,arc.end);
+  c.strokeStyle = "#000"
+  c.lineWidth = 3
+  c.stroke();
+  c.closePath();
+  // rope
+  c.beginPath();
+  c.moveTo(arc.x,arc.y-arc.r);
+  if(arrow.set){
+    c.lineTo(rope.x,arc.y);
+  }
+ 
+  c.lineTo(arc.x,arc.y+arc.r);
+  c.lineWidth = 1
+  c.stroke();
+  c.closePath();
+
+  if(arrow.set){
+  //arrow shaft
+  c.fillRect(rope.x,arc.y-3,10,6);
+  c.fillRect(rope.x,arc.y-1,arrow.w,2);
+  //arrow head
+  c.beginPath();
+  c.moveTo(rope.x+arrow.w,arc.y-4);
+  c.lineTo(rope.x+arrow.w+12,arc.y);
+  c.lineTo(rope.x+arrow.w,arc.y+4);
+  c.fill();
+  }else{
+  //arrow shaft
+  c.fillRect(arrow.x,arrow.y-3,10,6);
+  c.fillRect(arrow.x,arrow.y-1,arrow.w,2);
+  //arrow head
+  c.beginPath();
+  c.moveTo(arrow.x+arrow.w,arrow.y-4);
+  c.lineTo(arrow.x+arrow.w+12,arrow.y);
+  c.lineTo(arrow.x+arrow.w,arrow.y+4);
+  c.fill();
+
+  arrow.x+=12
+  if(arrow.x>c.w){
+    arrow.set=true
+  }
+  }
+
+  if(arc.y>c.h-c.h*.3 || arc.y<50){
+    arc.dy*=-1;
+  }
+  arc.y+=arc.dy;
+
+  
+}
+const arrow ={
+  x:c.w/2,
+  y:c.h/2,
+  w: 100,
+  set:true
+}
+
+const touch= (x1,y1,x2,y2, d) =>{
+		return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2) < d
+}
+
+const arc = {
+  x:30,
+  y:100,
+  dy:3,
+    r:50,
+    start:Math.PI+Math.PI/2,
+    end:Math.PI-Math.PI/2
+}
+
+const rope = {
+    h:arc.r*2,
+    x:arc.x-25,
+    status:true
 }
 
 function defend(){
   //TODO : second mini game defend against bandits
-}
-
-function city(){
-  // TODO: When you stop at a city
 }
 
 // might need to modify if price goes up and down along the wayToDo 
@@ -434,8 +575,8 @@ function drawPercentOfLine( x1, y1, x2, y2, percentage) {
 }
 
 // might need for archery game
-// onmousemove = e => { 
-//     mouse.x = e.clientX,
-//     mouse.y = e.clientY;
-//   }
+onmousemove = e => { 
+    mouse.x = e.clientX,
+    mouse.y = e.clientY;
+  }
 
