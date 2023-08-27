@@ -126,7 +126,7 @@ function setButtons(){
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
         //s=2, inputView(true), changeText("Input your caravan member's names!"),
-        s=4, changeText("Control your journey by making wise decisions!"), state="moving"
+        s=4, changeText("Control your journey by making wise decisions!"), state="city"
         //s=6, changeText(steps[curStep].desc), state="city",
         // music
         p0`240
@@ -357,7 +357,7 @@ function moving(){
     playerData.totalTraveled += camelPace[playerData.settings.pace]
     steps[curStep].percentage = playerData.currLeg/steps[curStep+1].miles
     playerData.supplies["Food"].val-= eating[playerData.settings.rations]*(5-playerData.dead)
-    playerData.supplies["camelFeed"].val-= eating[playerData.settings.rations]*3*playerData.supplies["Camels"]
+    playerData.supplies["CamelFeed"].val-= eating[playerData.settings.rations]*3*playerData.supplies["Camels"]
     if(playerData.supplies["Food"].val<10){
       state="rest"
       timerStatus="off"
