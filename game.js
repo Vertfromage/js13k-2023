@@ -28,7 +28,7 @@ const playerData = {
     Clothing: {val:0, cost:50},
     WaterSkins: {val:0, cost:5},
     TradeGoods: {val:0, cost:50}, 
-    Arrows: {val:0, cost:5},
+    Arrows: {val:20, cost:5},
     Tents: {val:0, cost:50}
   },
   settings : {
@@ -333,7 +333,9 @@ var animalArr = [{t:"🐪", v:0, w:990},{t:"🐏", v:0, w:99},{t:"🦌", v:0, w:
 function animals(){
   for(an of animalArr){
     if(an.v&& an.alive){
+      c.textBaseline='middle'
       tx(an.t, an.x, an.y, 5.3, '#E35A31')
+      c.textBaseline='alphabetic'
       an.y+=an.s
       if(an.y<10||an.y>c.h*.9){
         an.s*=-1
