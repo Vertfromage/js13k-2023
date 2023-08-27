@@ -12,9 +12,9 @@
 
 
 <!-- Hard -->
-[] Hunting mini game
+[x] Hunting mini game
 [] Raiders mini game
 [x] Mobile Friendly
-[] Music
+[x] Music
 [] Decentralized (Score? Wiki? nft?)
 [] Traveling caravan animation

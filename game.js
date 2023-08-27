@@ -17,14 +17,17 @@ const svg =["m -10.389267,104.73924 5.8771626,7.44441 L 64.446638,84.756881 196.
 var state = 'city'
 const dots = []
 var txScale = mobile ? 1.4 : 1
+var travelTimer
+var timerStatus="off"
+
 const playerData = {
-  members : [],
+  members : {},
   money: 1000,
   hunt:0,
   supplies : {
     Camels: {val:0, cost:100},
     CamelFeed: {val:0, cost:10},
-    Food: {val:0, cost:20},
+    Food: {val:100, cost:20},
     Clothing: {val:0, cost:50},
     WaterSkins: {val:0, cost:5},
     TradeGoods: {val:0, cost:50}, 
@@ -33,10 +36,15 @@ const playerData = {
   },
   settings : {
     pace: "steady",
-    rations: "good"
-  }
+    rations: "filling"
+  },
+  dead:0,
+  weather:"good",
+  currLeg:0,
+  totalTraveled: 0
 }
 const mouse = {x:0, y:0}
+playerData.date = new Date('1271-05-01')
 
 const lastPathSVG = svg[svg.length - 1];
 var temp = {x: 0, y:0}
@@ -48,25 +56,26 @@ lastPathSVG.split(" ").map((cor)=>{
     }
 })
 var curStep = 0
+const totalMiles = 12494
 const steps = [
-  { name: 'Vanice', country:'Italy', desc: "Venice thrived as a trading hub and cultural center.", start: dots[0], end: dots[1], percentage: .50},
-  { name: 'Acre', country:'Israel', desc: "Bustling port city that was a focal point of trade and cultural exchange.", start: dots[1], end: dots[2], percentage: 0 },
-  { name: 'Trebizond', country:'Iran', desc: "Vibrant Black Sea city that played a pivotal role in regional trade and commerce.", start: dots[2], end: dots[3], percentage: 0 },
-  { name: 'Baghdag', country:'Iraq', desc: "Historic city at the heart of Islamic civilization, known for its culture, scholarship, and economic significance.", start: dots[3], end: dots[4], percentage: 0},
-  { name: 'Terbil', country:'Iran', desc: "Strategic crossroads city known for its multicultural atmosphere and commercial importance.", start: dots[4], end: dots[5], percentage:0 },
-  { name: 'Ormuz', country:'Iran', desc: "Bustling island city strategically positioned along important maritime trade routes", start: dots[5], end: dots[6], percentage: 0},
-  { name: 'Balkh', country:'Afghanistan', desc: "Ancient city that was a vital center of trade and culture along the Silk Road", start: dots[6], end: dots[7], percentage: 0 },
-  { name: 'Kashgar', country:'China', desc: "Thriving oasis city that served as a key junction on the Silk Road trading network.", start: dots[7], end: dots[8], percentage: 0 },
-  { name: 'Lanzhou', country:'China', desc: "Strategic and culturally diverse city located along the Yellow River, contributing to the Silk Road's intricate tapestry.", start: dots[8], end: dots[9], percentage:0},
-  { name: 'Karakorem', country:'Mongolia', desc: "The capital of the Mongol Empire, a diverse and cosmopolitan city where he met Kublai Khan.", start: dots[9], end: dots[10], percentage: 0 },
-  { name: 'Beijing', country:'China', desc: "Heart of the Yuan Dynasty, a vibrant capital city where he would later serve in Kublai Khan's court.", start: dots[10], end: dots[11], percentage: 0 },
-  { name: "Chengdu", country:'China', desc: "Bustling city in southwestern China known for its irrigation systems, cultural vibrancy, and regional significance.", start: dots[11], end: dots[12], percentage:0 },
-  { name: "Pagan", country:'China', desc: "Vast landscape of temples and pagodas, showcasing the rich cultural heritage of Myanmar.", start: dots[12], end: dots[13], percentage:0},
+  { name: 'Vanice', country:'Italy', desc: "Venice thrived as a trading hub and cultural center.", start: dots[0], end: dots[1], percentage: 0, miles: 0},
+  { name: 'Acre', country:'Israel', desc: "Bustling port city, a focal point of trade and cultural exchange.", start: dots[1], end: dots[2], percentage: 0, miles:1900 },
+  { name: 'Trebizond', country:'Turkey', desc: "Vibrant Black Sea city that played a pivotal role in regional trade and commerce.", start: dots[2], end: dots[3], percentage: 0 , miles: 950 },
+  { name: 'Baghdag', country:'Iraq', desc: "Historic city at the heart of Islamic civilization, known for its culture, scholarship, and economic significance.", start: dots[3], end: dots[4], percentage: 0 , miles:830},
+  { name: 'Terbil', country:'Iran', desc: "Strategic crossroads city known for its multicultural atmosphere and commercial importance.", start: dots[4], end: dots[5], percentage:0 , miles:550},
+  { name: 'Ormuz', country:'Iran', desc: "Bustling island city strategically positioned along important maritime trade routes", start: dots[5], end: dots[6], percentage: 0, miles:812},
+  { name: 'Balkh', country:'Afghanistan', desc: "Ancient city that was a vital center of trade and culture along the Silk Road", start: dots[6], end: dots[7], percentage: 0 , miles:1400},
+  { name: 'Kashgar', country:'China', desc: "Thriving oasis city that served as a key junction on the Silk Road trading network.", start: dots[7], end: dots[8], percentage: 0, miles: 700 },
+  { name: 'Lanzhou', country:'China', desc: "Strategic and culturally diverse city located along the Yellow River, contributing to the Silk Road's intricate tapestry.", start: dots[8], end: dots[9], percentage:0, miles:1954},
+  { name: 'Karakorem', country:'Mongolia', desc: "The capital of the Mongol Empire, a diverse and cosmopolitan city where he met Kublai Khan.", start: dots[9], end: dots[10], percentage: 0 , miles:1000},
+  { name: 'Beijing', country:'China', desc: "Heart of the Yuan Dynasty, a vibrant capital city where he would later serve in Kublai Khan's court.", start: dots[10], end: dots[11], percentage: 0, miles: 970},
+  { name: "Chengdu", country:'China', desc: "Bustling city in southwestern China known for its irrigation systems, cultural vibrancy, and regional significance.", start: dots[11], end: dots[12], percentage:0, miles:1228 },
+  { name: "Pagan", country:'China', desc: "Vast landscape of temples and pagodas, showcasing the rich cultural heritage of Myanmar.", start: dots[12], end: dots[13], percentage:0, miles:1200},
   // This is the route to AsiaToDo the wiki map has the route back tooToDo
 ];
 // death ideas: Falling from a mountain pass, drowning in a river crossing, allergic reaction to silk, wrongfully accused and executed, rightfully accused and put to death, mistaken identity, etc.
 const death = ['fell from a mountain pass', 'drowned in river crossing', 'allergic reaction to silk','died of typhoid', 'died of exhaustion', 'lost in opium den', 'married a traveler', 'died of snake bite', 'wrongfully accused and executed', 'rightfully accused and put to death']
-
+const eventArr = ["You board a ship for the first leg of your journey from Venice to Acre."]
 // Button class
 class Button {
   constructor(x, y, width, height, label, scene, onClick) {
@@ -103,7 +112,10 @@ class Button {
 }
 }
 
+
 const buttons = []
+const camelPace = {slow:18, steady: 40, fast:70}
+const eating = {poor:1, moderate:3, filling:5}
 
 function setButtons(){
   var bW = mobile ? 250 : 200
@@ -113,9 +125,11 @@ function setButtons(){
   buttons.push(
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
-        //s=2, inputView(true), changeText("Input your caravan member's names!")
-        //s=4, changeText("Control your journey by making wise decisions!")
-        s=6, changeText(steps[curStep].desc), state="city", p0`240
+        //s=2, inputView(true), changeText("Input your caravan member's names!"),
+        s=4, changeText("Control your journey by making wise decisions!"), state="moving"
+        //s=6, changeText(steps[curStep].desc), state="city",
+        // music
+        p0`240
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
 J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|
 `
@@ -133,10 +147,11 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }),
       new Button(c.w*.4, c.h*.6, bW, bH, "Add Member!", 2, ()=>{
         if(txtInput.value.length>0){
-        playerData.members.push(txtInput.value)
+        // health: 0(dead), 1 (poor),2(fair), 3(good) 
+        playerData.members[txtInput.value] = {health:3, ill:"none"}
         txtInput.value = ""
-        changeText("Caravan Members: "+playerData.members.toString())
-        if(playerData.members.length==5){
+        changeText("Caravan Members: "+Object.keys(playerData.members).toString())
+        if(Object.keys(playerData.members).length==5){
           s=3, inputView(false), changeText("Buy Supplies for the journey ahead!")
         }
       }
@@ -166,9 +181,9 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       new Button(c.w*.5-bW*1.5-2, mapH+bH+5, bW, bH, "Interact!", 4, ()=>{
         // talk or trade
       }),      
-      new Button(bCen, mapH+bH+5, bW, bH, "Continue", 4, ()=>{
+      new Button(bCen, mapH+bH+5, bW, bH, "Rest", 4, ()=>{
         buttons[8].label=(buttons[8].label ==="Rest")? "Continue":"Rest"
-        state=(buttons[8].label ==="Rest")? "Rest":"Moving"
+        state=(buttons[8].label ==="Rest")? "rest":"moving"
       }),
       new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Shop!", 4, ()=>{
         if(state==='city'){s=3}else{
@@ -182,6 +197,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }),
       new Button(bCen, c.h/2, bW, bH, "Continue!", 6, ()=>{
         s=4, changeText("Control your journey by making wise decisions!")
+        state="moving"
       })
 
       )
@@ -210,7 +226,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
     H+=c.h*.06
   }
   buttons.push(new Button(c.w*.7, H, bW, bH, "Done!", 3, ()=>{
-    s=4
+    s=6, changeText(steps[curStep].desc), state="city"
   }))
 }
 setButtons()
@@ -241,6 +257,7 @@ function smoothAnimation(e) {
         case 6: city()
           break
     }
+    if(state==="moving"){moving()}
     drawButtons()
     reqAnimationId = requestAnimationFrame(smoothAnimation)
 }
@@ -274,6 +291,10 @@ function title() {
 function setup(){
   tx("Members of Caravan?", c.w / 2, c.h * .34, 5.3, '#E35A31')
 }
+const changeWeather = () =>{
+  let ran = Math.floor((Math.random() * 3))
+  playerData.weather= ran==2 ? "good" : ran==1 ? "fair" : "bad"
+}
 
 function statusPage(){
   let txtW=100
@@ -291,21 +312,36 @@ function statusPage(){
 
 function statusText(){
   let curFood= playerData.supplies["Food"].val,
-  distCity = "ToDo",
-  totalTraveled = "ToDo",
-  health="ToDo",
-  date="ToDo",
-  weather="ToDo",
-  mob = mobile?c.h/3:0
+  distCity = steps[curStep+1].miles-playerData.currLeg,
+  totalTraveled = playerData.totalTraveled,
+  health= healthStatus(),
+  date=playerData.date.toDateString(),
+  weather=playerData.weather,
+  mob = mobile?c.h/3:0 
 
-  tx("Date: "+date, c.w*.15, c.h*.1+mob, 3, 'DarkSlateGrey')
-  tx("Weather: "+weather, c.w *.15, c.h*.15+mob, 3, 'DarkSlateGrey')
-  tx("Health: "+health, c.w *.15, c.h*.2+mob, 3, 'DarkSlateGrey')
-  tx("Food: "+curFood, c.w*.8, c.h*.1+mob, 3, 'DarkSlateGrey')
-  tx("Next City: "+distCity, c.w *.8, c.h*.15+mob, 3, 'DarkSlateGrey')
-  tx("Traveled: "+totalTraveled, c.w *.8, c.h*.2+mob, 3, 'DarkSlateGrey')
+  tx("Date: "+date, c.w*.15, c.h*.1+mob, 2, 'DarkSlateGrey')
+  tx("Weather: "+weather, c.w *.15, c.h*.15+mob, 2, 'DarkSlateGrey')
+  tx("Health: "+health, c.w *.15, c.h*.2+mob, 2, 'DarkSlateGrey')
+  tx("Food: "+curFood, c.w*.8, c.h*.1+mob, 2, 'DarkSlateGrey')
+  tx("Next City: "+distCity, c.w *.8, c.h*.15+mob, 2, 'DarkSlateGrey')
+  tx("Traveled: "+totalTraveled, c.w *.8, c.h*.2+mob, 2, 'DarkSlateGrey')
 }
 
+const healthStatus = () =>{
+  let val =0
+  for(let mem in playerData.members){
+   val+=((playerData.members[mem]).health)
+  }
+  val =Math.ceil(val/(5-playerData.dead))
+  
+  switch(val){
+    case 0 : return "all dead"
+    case 1 : return "Poor"
+    case 2 : return "Fair"
+    case 3 : return "good"
+  }
+  return val
+}
 function city(){
   tx(steps[curStep].name, c.w / 2, c.h * .34, 6, '#E35A31')
   tx(steps[curStep].country, c.w / 2, c.h * .44, 4, '#E35A31')
@@ -313,7 +349,46 @@ function city(){
 }
 
 function moving(){
-  // TODO: everything that happens when not stopped at a city
+  if(timerStatus==="elapsed"){
+    /** one day's progress */
+    // miles, date, percent of path
+    playerData.date = addDays(playerData.date, 1)
+    playerData.currLeg += camelPace[playerData.settings.pace]
+    playerData.totalTraveled += camelPace[playerData.settings.pace]
+    steps[curStep].percentage = playerData.currLeg/steps[curStep+1].miles
+    playerData.supplies["Food"].val-= eating[playerData.settings.rations]*(5-playerData.dead)
+    playerData.supplies["camelFeed"].val-= eating[playerData.settings.rations]*3*playerData.supplies["Camels"]
+    if(playerData.supplies["Food"].val<10){
+      state="rest"
+      timerStatus="off"
+      clearInterval(travelTimer)
+      changeText("You have too little food you must stop to hunt!")
+      buttons[8].label="continue"
+      return
+    }
+    
+    // check if we've reached a new city
+    if(steps[curStep].percentage>=1){
+      curStep+=1
+      timerStatus="off"
+      state="city"
+      s=6, changeText(steps[curStep].desc)
+    }else{
+      timerStatus="on"
+    }
+    // check if there is a new event
+    // update amounts of food/water consumed 
+    
+  }else if(timerStatus==="off"){
+    timerStatus="on"
+    travelTimer = setInterval(()=>{timerStatus="elapsed"}, 1000);
+  }
+}
+
+function addDays(date, days) {
+  var result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
 }
 
 function hunt(){
