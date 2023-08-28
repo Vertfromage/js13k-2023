@@ -20,6 +20,11 @@ var txScale = mobile ? 1.4 : 1
 var travelTimer
 var timerStatus="off"
 
+const cities = new Image()
+
+cities.src = "cities.png"
+// 60 75
+
 const playerData = {
   members : {},
   money: 1000,
@@ -68,7 +73,7 @@ const steps = [
   { name: 'Kashgar', country:'China', desc: "Thriving oasis city that served as a key junction on the Silk Road trading network.", start: dots[7], end: dots[8], percentage: 0, miles: 700 },
   { name: 'Lanzhou', country:'China', desc: "Strategic and culturally diverse city located along the Yellow River, contributing to the Silk Road's intricate tapestry.", start: dots[8], end: dots[9], percentage:0, miles:1954},
   { name: 'Karakorem', country:'Mongolia', desc: "The capital of the Mongol Empire, a diverse and cosmopolitan city where he met Kublai Khan.", start: dots[9], end: dots[10], percentage: 0 , miles:1000},
-  { name: 'Beijing', country:'China', desc: "Heart of the Yuan Dynasty, a vibrant capital city where he would later serve in Kublai Khan's court.", start: dots[10], end: dots[11], percentage: 0, miles: 970},
+  { name: 'Beijing', country:'China', desc: "Heart of the Yuan Dynasty, a vibrant capital city where Marco Polo would later serve in Kublai Khan's court.", start: dots[10], end: dots[11], percentage: 0, miles: 970},
   { name: "Chengdu", country:'China', desc: "Bustling city in southwestern China known for its irrigation systems, cultural vibrancy, and regional significance.", start: dots[11], end: dots[12], percentage:0, miles:1228 },
   { name: "Pagan", country:'China', desc: "Vast landscape of temples and pagodas, showcasing the rich cultural heritage of Myanmar.", start: dots[12], end: dots[13], percentage:0, miles:1200},
   // This is the route to AsiaToDo the wiki map has the route back tooToDo
@@ -126,8 +131,8 @@ function setButtons(){
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
         //s=2, inputView(true), changeText("Input your caravan member's names!"),
-        s=4, changeText("Control your journey by making wise decisions!"), state="city"
-        //s=6, changeText(steps[curStep].desc), state="city",
+        //s=4, changeText("Control your journey by making wise decisions!"), state="city"
+        curStep=10,s=6, changeText(steps[curStep].desc), state="city",
         // music
         p0`240
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
@@ -135,10 +140,6 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
 `
       }),
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 1, ()=>{
-        // // temporary remove! Testing movement along map
-        // if(steps[0].percentage<1){
-        //   steps[0].percentage+=.05
-        // }
         s=4
       }),
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 5, ()=>{
@@ -195,7 +196,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
           alert("Can only visit shop in city!")
         }
       }),
-      new Button(bCen, c.h/2, bW, bH, "Continue!", 6, ()=>{
+      new Button(bCen, c.h*.6, bW, bH, "Continue!", 6, ()=>{
         s=4, changeText("Control your journey by making wise decisions!")
         state="moving"
       })
@@ -343,9 +344,12 @@ const healthStatus = () =>{
   return val
 }
 function city(){
-  tx(steps[curStep].name, c.w / 2, c.h * .34, 6, '#E35A31')
-  tx(steps[curStep].country, c.w / 2, c.h * .44, 4, '#E35A31')
-  // TODO: Image representing city - could be decentralized add on
+  
+  let sx = curStep<7 ? curStep*80 : (curStep-7)*80
+  let sy = curStep<7 ? 0 : 75
+  c.drawImage(cities,sx,sy, 80, 75, c.w/2-80*3/2, c.h/2-75*3/2+20, 80*3, 75*3)
+  tx(steps[curStep].name, c.w / 2, c.h * .15, 6, '#E35A31')
+  tx(steps[curStep].country, c.w / 2, c.h * .25, 4, '#E35A31')
 }
 
 function moving(){
