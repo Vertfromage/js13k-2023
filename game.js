@@ -23,7 +23,6 @@ var timerStatus="off"
 const cities = new Image()
 
 cities.src = "cities.png"
-// 60 75
 
 const playerData = {
   members : {},
@@ -343,8 +342,8 @@ const healthStatus = () =>{
   }
   return val
 }
+
 function city(){
-  
   let sx = curStep<7 ? curStep*80 : (curStep-7)*80
   let sy = curStep<7 ? 0 : 75
   c.drawImage(cities,sx,sy, 80, 75, c.w/2-80*3/2, c.h/2-75*3/2+20, 80*3, 75*3)
@@ -355,7 +354,6 @@ function city(){
 function moving(){
   if(timerStatus==="elapsed"){
     /** one day's progress */
-    // miles, date, percent of path
     playerData.date = addDays(playerData.date, 1)
     playerData.currLeg += camelPace[playerData.settings.pace]
     playerData.totalTraveled += camelPace[playerData.settings.pace]
@@ -380,9 +378,6 @@ function moving(){
     }else{
       timerStatus="on"
     }
-    // check if there is a new event
-    // update amounts of food/water consumed 
-    
   }else if(timerStatus==="off"){
     timerStatus="on"
     travelTimer = setInterval(()=>{timerStatus="elapsed"}, 1000);
@@ -479,19 +474,14 @@ function bow(){
   }
   arc.y+=arc.dy;
 
-  
 }
+
 const arrow ={
   x:c.w/2,
   y:c.h/2,
   w: 100,
   set:true
 }
-
-const touch= (x1,y1,x2,y2, d) =>{
-		return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2) < d
-}
-
 const arc = {
   x:30,
   y:100,
@@ -500,7 +490,6 @@ const arc = {
     start:Math.PI+Math.PI/2,
     end:Math.PI-Math.PI/2
 }
-
 const rope = {
     h:arc.r*2,
     x:arc.x-25,
@@ -540,7 +529,6 @@ function map(){
   tx("Map", c.w / 2, c.h * .1, 5.3, '#E35A31')
   changeText("This is the map")
 }
-
 function drawMap(size, tX, tY){
   // draw map
   svg.forEach((svgPath, i) => {
@@ -579,8 +567,6 @@ function drawMap(size, tX, tY){
   })
 }
 
-
-
 start()
 
 /** UTILS */
@@ -593,7 +579,6 @@ function resize(){
   setButtons()
 }
 window.addEventListener('resize', resize);
-
 
 function start() {
     reqAnimationId = requestAnimationFrame(smoothAnimation)
@@ -624,7 +609,7 @@ function handleButtonClick(x, y, s) {
 
 function drawButtons() {
     buttons.forEach(button => button.s==s && button.draw())
-  }
+}
 
 function toggleTextContainer(show) {
     textContainer.style.display = show ? "block" : "none";
@@ -658,9 +643,13 @@ function drawPercentOfLine( x1, y1, x2, y2, percentage) {
   c.lineWidth=1
 }
 
-// might need for archery game
-onmousemove = e => { 
-    mouse.x = e.clientX,
-    mouse.y = e.clientY;
-  }
+const touch =(x1,y1,x2,y2, d) =>{
+  return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2) < d
+}
+
+// // might need for archery game
+// onmousemove = e => { 
+//     mouse.x = e.clientX,
+//     mouse.y = e.clientY;
+//   }
 

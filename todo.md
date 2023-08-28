@@ -9,6 +9,8 @@
 [] Trade *
 [] Talk
 [] Choose profession
+[] status page - health of members + quantity of each item
+[] Shop needs tweaking
 
 
 <!-- Hard -->
@@ -18,3 +20,4 @@
 [x] Music
 [] Decentralized (Score? Wiki? nft?)
 [] Traveling caravan animation
+[] Restart
