@@ -29,18 +29,18 @@ const playerData = {
   money: 1000,
   hunt:0,
   supplies : {
-    Camels: {val:0, cost:100},
-    CamelFeed: {val:0, cost:10},
-    Food: {val:100, cost:20},
-    Clothing: {val:0, cost:50},
-    WaterSkins: {val:0, cost:5},
-    TradeGoods: {val:0, cost:50}, 
-    Arrows: {val:20, cost:5},
-    Tents: {val:0, cost:50}
+    Camels: {n:0, q:1, val:0, cost:100},
+    CamelFeed: {n:0, q:20, val:0, cost:10},
+    Food: {n:0, q:20, val:0, cost:20}, // need about 1,188 lb steady pace filling diet
+    Clothing: {n:0,q:1, val:0, cost:50},
+    WaterSkins: {n:0,q:5, val:0, cost:5},
+    TradeGoods: {n:0,q:1, val:0, cost:50}, 
+    Arrows: {n:10, q:20,val:0, cost:10},
+    Tents: {n:0,q:1, val:0, cost:50}
   },
   settings : {
-    pace: "steady",
-    rations: "filling"
+    pace: "fast",
+    rations: "poor"
   },
   dead:0,
   weather:"good",
@@ -131,7 +131,9 @@ function setButtons(){
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
         //s=2, inputView(true), changeText("Input your caravan member's names!"),
         //s=4, changeText("Control your journey by making wise decisions!"), state="city"
-        curStep=10,s=6, changeText(steps[curStep].desc), state="city",
+        //curStep=10,s=6, changeText(steps[curStep].desc), state="city",
+        s=3 
+        toggleTextContainer(false)
         // music
         p0`240
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
@@ -140,6 +142,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }),
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 1, ()=>{
         s=4
+        toggleTextContainer(true)
       }),
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 5, ()=>{
         playerData.supplies.Food.val+= playerData.hunt<200 ? playerData.hunt : 200
@@ -186,7 +189,10 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         state=(buttons[8].label ==="Rest")? "rest":"moving"
       }),
       new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Shop!", 4, ()=>{
-        if(state==='city'){s=3}else{
+        if(state==='city'){
+          s=3
+          toggleTextContainer(false)
+        }else{
           alert("Can only visit shop in city!")
         }
       }),
@@ -210,21 +216,24 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
           if(playerData.money - playerData.supplies[currentItem].cost >=0){
             playerData.money -= playerData.supplies[currentItem].cost
             playerData.supplies[currentItem].val+=playerData.supplies[currentItem].cost
+            playerData.supplies[currentItem].n+=playerData.supplies[currentItem].q
           }
         };
       })()),
       new Button(c.w * 0.78, H, 60, 30, "-", 3, (() => {
         const currentItem = item;
         return () => {
-          if(playerData.supplies[currentItem].val >0){
+          if(playerData.supplies[currentItem].n>=playerData.supplies[currentItem].q){
             playerData.money += playerData.supplies[currentItem].cost
             playerData.supplies[currentItem].val-=playerData.supplies[currentItem].cost
+            playerData.supplies[currentItem].n-=playerData.supplies[currentItem].q
           }
         };
       })())
     )
     H+=c.h*.06
   }
+  H+=c.h*.05
   buttons.push(new Button(c.w*.7, H, bW, bH, "Done!", 3, ()=>{
     s=6, changeText(steps[curStep].desc), state="city"
   }))
@@ -380,7 +389,7 @@ function moving(){
     }
   }else if(timerStatus==="off"){
     timerStatus="on"
-    travelTimer = setInterval(()=>{timerStatus="elapsed"}, 1000);
+    travelTimer = setInterval(()=>{timerStatus="elapsed"}, 3000);
   }
 }
 
@@ -506,16 +515,19 @@ function shop(){
   let H=c.h*.19
   sum = 0
   tx("Item", c.w*.2, H, 4,'DarkSlateGrey')
-  tx("Num", c.w*.35, H, 4,'DarkSlateGrey')
-  tx("Cost", c.w*.5, H, 4, 'DarkSlateGrey')
+  tx("$", c.w*.35, H, 4,'DarkSlateGrey')
+  tx("Num", c.w*.45, H, 4,'DarkSlateGrey')
+  tx("Val", c.w*.55, H, 4, 'DarkSlateGrey')
   H+=c.h*.06
 for(item in playerData.supplies){
   tx(item, c.w*.2, H, 3, '#E35A31')
-  tx(playerData.supplies[item].val/playerData.supplies[item].cost, c.w*.35, H, 3, 'DarkSlateGrey')
-  tx(playerData.supplies[item].val, c.w*.5, H, 3, 'DarkSlateGrey')
+  tx(playerData.supplies[item].cost, c.w*.35, H, 3, '#E35A31')
+  tx(playerData.supplies[item].n, c.w*.45, H, 3, 'DarkSlateGrey')
+  tx(playerData.supplies[item].val, c.w*.55, H, 3, 'DarkSlateGrey')
   H+=c.h*.06
   sum+=playerData.supplies[item].val
 }
+H+=c.h*.05
 tx("Total "+sum+"$", c.w*.5, H, 3, 'DarkSlateGrey')
 H+=c.h*.05
 tx("You have "+playerData.money+"$", c.w*.5, H, 3, 'DarkSlateGrey')

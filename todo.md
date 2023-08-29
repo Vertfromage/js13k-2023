@@ -21,3 +21,8 @@
 [] Decentralized (Score? Wiki? nft?)
 [] Traveling caravan animation
 [] Restart
+
+<!-- Picky -->
+[] Make value of objects change at each city
+[] Make sure to subtract objects properly as used
+[] If you run out of food/water people and camels start to starve/die of thirst
