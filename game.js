@@ -33,7 +33,7 @@ const playerData = {
     CamelFeed: {n:0, q:50, cost:10},
     Food: {n:500, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
     Clothing: {n:0,q:1, cost:10},
-    WaterSkins: {n:0,q:5, cost:5},
+    WaterSkins: {n:0, e:0, q:20, cost:5},
     TradeGoods: {n:0,q:1, cost:10}, 
     Arrows: {n:20, q:20, cost:10},
     Tents: {n:0,q:1, cost:20}
@@ -83,10 +83,21 @@ const steps = [
   // This is the route to AsiaToDo the wiki map has the route back tooToDo
 ];
 // death ideas: Falling from a mountain pass, drowning in a river crossing, allergic reaction to silk, wrongfully accused and executed, rightfully accused and put to death, mistaken identity, etc.
-const death = ['fell from a mountain pass', 'drowned in river crossing', 'allergic reaction to silk','died of typhoid', 'died of exhaustion', 'lost in opium den', 'married a traveler', 'died of snake bite', 'wrongfully accused and executed', 'rightfully accused and put to death']
-const eventArr = ["You board a ship for the first leg of your journey from Venice to Acre."]
-const pageText =['','This is the map!',"Input your caravan member's names!", '',"Control your journey by making wise decisions!", "","You can only carry 200lbs! Use as few arrows as possible!"]
+const death = ['fall from a mountain pass', 'drowning in river crossing', 'allergic reaction to silk','typhoid', 'exhaustion', 'opium den', 'murder by fellow traveler', 'snake bite', 'wrongfully accused and executed', 'rightfully accused and put to death']
+const commonIllnesses = [
+  'Dysentery',  'Malaria',  'Typhoid',  'Cholera',  'Pneumonia',  'Tuberculosis',
+  'Influenza',  'Measles',  'Smallpox',  'Yellow Fever',  'Plague',  'Food Poisoning',
+  'Heatstroke',  'Frostbite',  'Malnutrition',  'Dehydration',  'Infected wound',
+  'Respiratory Infection',  'Parasitic Infection',  'Venomous Snake Bite',  'Dengue Fever',
+  'Hepatitis',  'Rabies'
+]
+const eventArr = ["death", "water", "sick", "rob", "attack"]
+const distBasedEvents = [{d:20, t:"You board a ship for the first leg of your journey from Venice to Acre."}, {d:1000,t:"testing"}]
+var dEvent = 0
+const pageText =['','This is the map!',"Input your caravan member's names!", '',"Control your journey by making wise decisions!", "You can only carry 200lbs! Use as few arrows as possible!"]
 var latestEvent = ""
+var log=[] // Too keep track of all events
+
 
 // Button class
 class Button {
@@ -135,9 +146,9 @@ function setButtons(){
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
       // very first scene should be s2: choose members 
-      //s=2, inputView(true), changeText(pageText[s])
+      s=2, inputView(true), changeText(pageText[s])
         
-      s=4,changeText(pageText[s]), state="city", toggleTextContainer(true)
+      //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
       
       // music
         p0`240
@@ -155,7 +166,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         playerData.supplies.Food.num+= amount
         s=4
         changeText(pageText[s])
-        dayPasses()
+        dayPasses() 
       }),
       new Button(c.w*.4, c.h*.6, bW, bH, "Add Member!", 2, ()=>{
         if(txtInput.value.length>0){
@@ -164,7 +175,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         txtInput.value = ""
         changeText("Caravan Members: "+Object.keys(playerData.members).toString())
         if(Object.keys(playerData.members).length==5){
-          s=3, inputView(false), changeText(pageText[s])
+          s=3, inputView(false), toggleTextContainer(false)
         }
       }
       }),
@@ -196,7 +207,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }),      
       new Button(bCen, mapH+bH+5, bW, bH, "Continue", 4, ()=>{
         if(state==="runningOut"){return}
-        buttons[8].label ==="Rest" ? latestEvent="Having a little rest.":latestEvent="On the move again!"
+        buttons[8].label ==="Rest" ? newEvent("Having a little rest."):newEvent("On the move again!")
         state=(buttons[8].label ==="Rest")? "rest":"moving"
         buttons[8].label=(buttons[8].label ==="Rest")? "Continue":"Rest"
       }),
@@ -215,9 +226,9 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
           alert("Can only visit shop in city!")
         }
       }),
-      new Button(bCen, c.h*.6, bW, bH, "Overview!", 6, ()=>{
+      new Button(bCen, c.h*.7, bW, bH, "Overview!", 6, ()=>{
         s=4, changeText("Control your journey by making wise decisions!")
-        toggleTextContainer(true)
+        toggleTextContainer(true), newEvent("You arrived in "+steps[curStep].name+", "+steps[curStep].country)
       })
 
       )
@@ -248,7 +259,6 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
   H+=c.h*.05
   buttons.push(new Button(c.w*.7, H, bW, bH, "Done!", 3, ()=>{
     s=6, changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
-    latestEvent = "You arrived in "+steps[curStep].name+", "+steps[curStep].country
   }))
 }
 setButtons()
@@ -279,6 +289,7 @@ function smoothAnimation(e) {
           break
         case 6: city()
           break
+        case 7: lose()
     }
     if(state==="moving"||state==="rest"){moving()}
     drawButtons()
@@ -324,7 +335,7 @@ function statusPage(){
   c.fillRect(0, (mobile? c.h*.28 : c.h/3)-10, c.w, txtW)
   c.fillStyle = "DarkSlateGrey"
   drawRoundedRect(c,5, (mobile? c.h*.28 : c.h/3)-5, c.w-10, txtW-10)
-  tx(latestEvent, c.w / 2, (mobile? c.h*.31 : c.h*.45), 3, 'GoldenRod')
+  tx(latestEvent, c.w / 2, (mobile? c.h*.31 : c.h*.45), 2.5, 'GoldenRod')
   c.fillStyle = "lightblue"
   let scale2 = mobile ? {s:3,w: c.w*.1, h: -c.h*.03} : {s:1,w: c.w*.45, h: -c.h*.1}
   mobile ? c.fillRect(0, 0, c.w, c.h*.28) : drawRoundedRect(c,c.w/3, 5, c.w/3, c.h/3+10) 
@@ -334,19 +345,24 @@ function statusPage(){
 
 function statusText(){
   let curFood= playerData.supplies["Food"].n,
+  curWater = playerData.supplies["WaterSkins"].n,
   distCity = steps[curStep+1].miles-playerData.currLeg,
   totalTraveled = playerData.totalTraveled,
   health= healthStatus(),
   date=playerData.date.toDateString(),
   weather=playerData.weather,
-  mob = mobile?c.h/3:0 
+  mob = mobile?c.h/3:0, 
+  left = c.w*.15,
+  right = c.w*.8
 
-  tx("Date: "+date, c.w*.15, c.h*.1+mob, 2, 'DarkSlateGrey')
-  tx("Weather: "+weather, c.w *.15, c.h*.15+mob, 2, 'DarkSlateGrey')
-  tx("Health: "+health, c.w *.15, c.h*.2+mob, 2, 'DarkSlateGrey')
-  tx("Food: "+curFood+" lbs", c.w*.8, c.h*.1+mob, 2, 'DarkSlateGrey')
-  tx("Next City: "+distCity+" miles", c.w *.8, c.h*.15+mob, 2, 'DarkSlateGrey')
-  tx("Traveled: "+totalTraveled+" miles", c.w *.8, c.h*.2+mob, 2, 'DarkSlateGrey')
+  tx("Date: "+date, left, c.h*.1+mob, 2, 'DarkSlateGrey')
+  tx("Next City: "+distCity+" miles", left, c.h*.15+mob, 2, 'DarkSlateGrey')
+  tx("Traveled: "+totalTraveled+" miles", left, c.h*.2+mob, 2, 'DarkSlateGrey')
+  tx("Weather: "+weather, left, c.h*.25+mob, 2, 'DarkSlateGrey')
+  tx("Health: "+health, right, c.h*.1+mob, 2, 'DarkSlateGrey')
+  tx("Food: "+curFood+" lbs", right, c.h*.15+mob, 2, 'DarkSlateGrey')
+  tx("Water: "+curWater+" skins", right, c.h*.2+mob, 2, 'DarkSlateGrey')
+  
 }
 
 const healthStatus = () =>{
@@ -357,7 +373,9 @@ const healthStatus = () =>{
   val =Math.ceil(val/(5-playerData.dead))
   
   switch(val){
-    case 0 : return "all dead"
+    case 0 : s=7
+      changeText("This is the end... refresh to restart!")
+      return
     case 1 : return "Poor"
     case 2 : return "Fair"
     case 3 : return "good"
@@ -383,6 +401,11 @@ function moving(){
       playerData.currLeg += camelPace[playerData.settings.pace]
       playerData.totalTraveled += camelPace[playerData.settings.pace]
       steps[curStep].percentage = playerData.currLeg/steps[curStep+1].miles
+
+      if(dEvent<distBasedEvents.length && playerData.totalTraveled >= distBasedEvents[dEvent].d){
+        newEvent(distBasedEvents[dEvent].t )
+        dEvent++
+      }
     }
 
     if(playerData.supplies["Food"].n<50){
@@ -395,10 +418,13 @@ function moving(){
     
     // check if we've reached a new city
     if(steps[curStep].percentage>=1){
+      steps[curStep].percentage=1
+      playerData.currLeg=0
       curStep+=1
       timerStatus="off"
       state="city"
       s=6, changeText(steps[curStep].desc)
+      buttons[8].label="Continue"
     }else{
       timerStatus="on"
     }
@@ -414,12 +440,107 @@ function dayPasses(){
   // supplies consumed
   playerData.supplies["Food"].n-= eating[playerData.settings.rations]*(5-playerData.dead)
   playerData.supplies["CamelFeed"].n-= eating[playerData.settings.rations]*3*playerData.supplies["Camels"]
+  if(playerData.supplies["WaterSkins"].n>0){
+    playerData.supplies["WaterSkins"].n-= (5-playerData.dead)
+    playerData.supplies["WaterSkins"].e+= (5-playerData.dead)
+  }
+  if(playerData.supplies["Food"].n<0){
+    playerData.supplies["Food"].n=0
+  } 
+  if(playerData.supplies["CamelFeed"].n<0){
+    playerData.supplies["CamelFeed"].n= 0
+  }
+
+  if(Math.random() >.7){
+    randomEvent()
+  }
 }
 
 function addDays(date, days) {
   var result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
+}
+
+function newEvent(e){
+  latestEvent = e
+  log.push(playerData.date.toDateString()+" : "+e)
+  console.log(log)
+}
+
+function randomEvent(){
+  let rand = Math.random() * eventArr.length << 0
+  switch (rand) {
+    case 0: memDied()
+      break
+    case 1: newEvent("Stopped at Oasis to refill water!")
+            playerData.supplies["WaterSkins"].n+=playerData.supplies["WaterSkins"].e
+            playerData.supplies["WaterSkins"].e=0
+      break
+    case 2: memSick()
+      break
+    case 3: robbed()
+      break
+    case 4: //TODO: attack minigame
+      break
+}
+}
+
+function memDied(){
+  let who = randProp(playerData.members)
+  if(who.health>0){
+  who.health = 0
+  let diedOf 
+  if(who.ill === "none"){
+    diedOf = randObj(death)
+  }else{
+    diedOf = who.ill
+  }
+  who.death = diedOf
+  newEvent(who.k+" died of "+diedOf)
+}
+}
+
+function memSick(){
+  if(Math.random()*(playerData.rations==="good"? 10 : 5) < 4){
+  let who = randProp(playerData.members)
+  if(who.health>0){
+    who.health -= 1
+    if(who.health<1){
+      newEvent(who.k+" died of "+(who.ill==="none"? "fatigue":who.ill))
+    }else{
+      let sickOf = randObj(commonIllnesses)
+      who.ill = sickOf
+      newEvent(who.k+" sick from "+sickOf)
+    }
+  }
+}
+}
+
+const randObj = (arr) =>{
+  return arr[Math.floor((Math.random() * arr.length))]
+}
+
+// https://stackoverflow.com/a/15106541
+const randProp = (obj)=> {
+  let keys = Object.keys(obj)
+  let k = keys[keys.length * Math.random() << 0]
+  obj[k].k = k
+  return obj[k]
+}
+
+function robbed(){
+  let what = randProp(playerData.supplies)
+  if(what.n>0){
+    let loss = what.n/4 << 0 || 1
+    what.n = what.n-loss
+    newEvent("Your party was robbed! Lost: "+loss+" "+what.k)
+  }
+}
+
+function refillWater(){
+  playerData.supplies["WaterSkins"].n= playerData.supplies["WaterSkins"].e
+  playerData.supplies["WaterSkins"].e=0
 }
 
 function hunt(){
@@ -603,6 +724,14 @@ function drawMap(size, tX, tY){
 }
 
 start()
+
+function lose(){
+  tx("All your members are dead, you lose!",c.w/2, c.h/2, 4, "blue")
+}
+
+function win(){
+//TODO: what happens at end
+}
 
 /** UTILS */
 function resize(){
