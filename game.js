@@ -150,9 +150,9 @@ function setButtons(){
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
       // very first scene should be s2: choose members 
-      //s=2, inputView(true), changeText(pageText[s])
+      s=2, inputView(true), changeText(pageText[s])
         
-      s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
+      //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
       //s=8
       // music
         p0`240
