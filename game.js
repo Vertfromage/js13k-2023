@@ -31,11 +31,11 @@ const playerData = {
   supplies : {
     Camels: {n:0, q:1,  cost:100},
     CamelFeed: {n:0, q:50, cost:10},
-    Food: {n:500, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
+    Food: {n:0, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
     Clothing: {n:0,q:1, cost:10},
     WaterSkins: {n:0, e:0, q:20, cost:5},
     TradeGoods: {n:0,q:10, cost:100}, 
-    Arrows: {n:20, q:20, cost:10},
+    Arrows: {n:0, q:20, cost:10},
     Tents: {n:0,q:1, cost:20}
   },
   settings : {
@@ -77,7 +77,7 @@ const steps = [
   { name: 'Kashgar', country:'China', desc: "Thriving oasis city that served as a key junction on the Silk Road trading network.", start: dots[7], end: dots[8], percentage: 0, miles: 700 },
   { name: 'Lanzhou', country:'China', desc: "Strategic and culturally diverse city located along the Yellow River, contributing to the Silk Road's intricate tapestry.", start: dots[8], end: dots[9], percentage:0, miles:1954},
   { name: 'Karakorem', country:'Mongolia', desc: "The capital of the Mongol Empire, a diverse and cosmopolitan city where he met Kublai Khan.", start: dots[9], end: dots[10], percentage: 0 , miles:1000},
-  { name: 'Beijing', country:'China', desc: "Heart of the Yuan Dynasty, a vibrant capital city where Marco Polo would later serve in Kublai Khan's court.", start: dots[10], end: dots[11], percentage: 0, miles: 970},
+  { name: 'Beijing', country:'China', desc: "Heart of the Yuan Dynasty, a vibrant capital city where Marco Polo would later serve in Kublai Khan's court.", start: dots[10], end: dots[11], percentage: 0, miles: 1970},
   { name: "Chengdu", country:'China', desc: "Bustling city in southwestern China known for its irrigation systems, cultural vibrancy, and regional significance.", start: dots[11], end: dots[12], percentage:0, miles:1228 },
   { name: "Pagan", country:'China', desc: "Vast landscape of temples and pagodas, showcasing the rich cultural heritage of Myanmar.", start: dots[12], end: dots[13], percentage:0, miles:1200},
   // This is the route to AsiaToDo the wiki map has the route back tooToDo
@@ -426,6 +426,16 @@ function moving(){
       buttons[8].label="continue"
       return
     }
+    if(
+        playerData.supplies["Food"].n<1 
+      && playerData.supplies["Camels"].n>0 
+      && (Math.random()*10<1)
+    ){
+      playerData.supplies["Camels"].n--
+      newEvent("You have no camel feed, one of your camels died! Food store increases.")
+      playerData.supplies["Food"].n+=200
+    }
+
 
     let who = randProp(playerData.members)
     if(playerData.supplies["WaterSkins"].n<1){
