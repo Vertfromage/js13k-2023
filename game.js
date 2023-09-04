@@ -26,8 +26,8 @@ const cities = new Image()
 cities.src = "cities.png"
 
 const playerData = {
-  members : {},
-  //members:{"Joey":{health:3, ill:"none"},"Floe":{health:2, ill:"none"},"Stan":{health:1, ill:"none"},"Christopher":{health:3, ill:"none"},"Theodore":{health:0, ill:"none"}},
+  //members : {},
+  members:{"Joey":{health:3, ill:"none"},"Floe":{health:2, ill:"none"},"Stan":{health:1, ill:"none"},"Christopher":{health:3, ill:"none"},"Theodore":{health:0, ill:"none"}},
   money: 2000,
   hunt:0,
   supplies : {
