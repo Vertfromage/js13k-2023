@@ -19,24 +19,26 @@ const dots = []
 var txScale = mobile ? 1.4 : 1
 var travelTimer
 var timerStatus="off"
+const colors = ["GoldenRod","DarkGoldenRod", "DarkSlateGrey", '#E35A31']
 
 const cities = new Image()
 
 cities.src = "cities.png"
 
 const playerData = {
-  members : {},
+  //members : {},
+  members:{"Joey":{health:3, ill:"none"},"Floe":{health:2, ill:"none"},"Stan":{health:1, ill:"none"},"Christopher":{health:3, ill:"none"},"Theodore":{health:0, ill:"none"}},
   money: 2000,
   hunt:0,
   supplies : {
-    Camels: {n:0, q:1,  cost:100},
-    CamelFeed: {n:0, q:50, cost:10},
-    Food: {n:0, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
-    Clothing: {n:0,q:1, cost:10},
-    WaterSkins: {n:0, e:0, q:20, cost:5},
-    TradeGoods: {n:0,q:10, cost:100}, 
-    Arrows: {n:0, q:20, cost:10},
-    Tents: {n:0,q:1, cost:20}
+    Camels: {n:2, q:1,  cost:100},
+    CamelFeed: {n:500, q:50, cost:10},
+    Food: {n:500, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
+    Clothing: {n:3,q:1, cost:10},
+    WaterSkins: {n:200, e:0, q:20, cost:5},
+    TradeGoods: {n:100,q:10, cost:100}, 
+    Arrows: {n:60, q:20, cost:10},
+    Tents: {n:3,q:1, cost:20}
   },
   settings : {
     pace: "fast",
@@ -113,8 +115,8 @@ class Button {
   }
 
   draw() {
-    c.fillStyle = this.isClicked ? "GoldenRod" : "DarkGoldenRod";
-    c.fillStyle = "GoldenRod"
+    c.fillStyle = this.isClicked ? colors[0] : colors[1];
+    c.fillStyle = colors[0]
     c.shadowColor = "rgba(0, 0, 0, 0.3)"
     c.shadowBlur = 6
     c.shadowOffsetX = 3
@@ -122,7 +124,7 @@ class Button {
 
     drawRoundedRect(c, this.x, this.y, this.width, this.height)
 
-    c.fillStyle = "DarkSlateGrey"
+    c.fillStyle = colors[2]
     c.font = 3*txScale+"vw Consolas"
     c.textAlign = "center"
     c.textBaseline = "middle"
@@ -146,10 +148,10 @@ function setButtons(){
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
       // very first scene should be s2: choose members 
-      s=2, inputView(true), changeText(pageText[s])
+      //s=2, inputView(true), changeText(pageText[s])
         
       //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
-      
+      s=8
       // music
         p0`240
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
@@ -161,6 +163,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         toggleTextContainer(true)
         changeText(pageText[s])
       }),
+
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 5, ()=>{
         let amount = playerData.hunt<200 ? playerData.hunt : 200
         playerData.supplies.Food.n+= amount
@@ -184,7 +187,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }
       }),
       new Button(c.w*.5-bW*1.5-2, mapH, bW, bH, "Status!", 4, ()=>{
-        
+        s=8, changeText("Check on your supplies and party members!")
       }),
       new Button(bCen, mapH, bW, bH, "Hunt!", 4, ()=>{
         if(state!=='city'){
@@ -233,8 +236,22 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       new Button(bCen, c.h*.7, bW, bH, "Overview!", 6, ()=>{
         s=4, changeText("Control your journey by making wise decisions!")
         toggleTextContainer(true), newEvent("You arrived in "+steps[curStep].name+", "+steps[curStep].country)
-      })
-
+      }),
+      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 8, ()=>{
+        s=4
+        toggleTextContainer(true)
+        changeText(pageText[s])
+      }),
+      new Button(c.w*.4, c.h*.55, bW*.7, bH*.7, playerData.settings["pace"], 8, ()=>{
+        flipSetting(13,["slow","steady","fast"], "pace")
+      
+      }),
+      new Button(c.w*.55, c.h*.55, bW*.7, bH*.7, playerData.settings["rations"], 8, ()=>{
+        flipSetting(14,["poor","moderate","filling"], "rations")
+      }),
+      new Button(c.w*.7, c.h*.55, bW*.7, bH*.7, playerData.settings["load"], 8, ()=>{
+        flipSetting(15,["light","medium","heavy"], "load")
+      }),
       )
   var H=c.h*.22
   for(item in playerData.supplies){
@@ -271,13 +288,18 @@ changeText("Embark on a journey along the Silk Road, making strategic decisions 
 const inputView = (show) =>{
   txtInput.style.display = show ? "block" : "none";
 }
-
+const flipSetting = (n, arr, set) => {
+  let curr = buttons[n].label
+  let index = arr.indexOf(curr)
+  buttons[n].label = index<1? arr[1] : index<2 ? arr[2] : arr[0] 
+  playerData.settings[set] = buttons[n].label
+}
 
 // start game loop
 let reqAnimationId
 function smoothAnimation(e) {
 	a.width = innerWidth, a.height = innerHeight
-  if(mobile){tx("!!Better in wide view!!", c.w / 2, c.h * .75, 6, 'DarkSlateGrey')}
+  if(mobile){tx("!!Better in wide view!!", c.w / 2, c.h * .75, 6, colors[2])}
     switch (s) {
         case 0: title()
           break
@@ -287,13 +309,15 @@ function smoothAnimation(e) {
           break
         case 3: shop()
           break
-        case 4: statusPage()
+        case 4: mainPage()
           break
         case 5: hunt()
           break
         case 6: city()
           break
         case 7: lose()
+          break
+        case 8: statusPage()
     }
     if(state==="moving"||state==="rest"){moving()}
     drawButtons()
@@ -321,33 +345,33 @@ onclick = e => {
 }
 
 function title() {
-  tx("Journey to the East", c.w / 2, c.h * .34, 6, '#E35A31')
-  tx("Silk Road Adventure", c.w / 2, c.h * .44, 4, '#E35A31')
+  tx("Journey to the East", c.w / 2, c.h * .34, 6, colors[3])
+  tx("Silk Road Adventure", c.w / 2, c.h * .44, 4, colors[3])
 }
 
 function setup(){
-  tx("Members of Caravan?", c.w / 2, c.h * .34, 5.3, '#E35A31')
+  tx("Members of Caravan?", c.w / 2, c.h * .34, 5.3, colors[3])
 }
 const changeWeather = () =>{
   let ran = Math.floor((Math.random() * 3))
   playerData.weather= ran==2 ? "good" : ran==1 ? "fair" : "bad"
 }
 
-function statusPage(){
+function mainPage(){
   let txtW=100
-  c.fillStyle = "GoldenRod"
+  c.fillStyle = colors[0]
   c.fillRect(0, (mobile? c.h*.28 : c.h/3)-10, c.w, txtW)
-  c.fillStyle = "DarkSlateGrey"
+  c.fillStyle = colors[2]
   drawRoundedRect(c,5, (mobile? c.h*.28 : c.h/3)-5, c.w-10, txtW-10)
   tx(latestEvent, c.w / 2, (mobile? c.h*.31 : c.h*.45), 2.5, 'GoldenRod')
   c.fillStyle = "lightblue"
   let scale2 = mobile ? {s:3,w: c.w*.1, h: -c.h*.03} : {s:1,w: c.w*.45, h: -c.h*.1}
   mobile ? c.fillRect(0, 0, c.w, c.h*.28) : drawRoundedRect(c,c.w/3, 5, c.w/3, c.h/3+10) 
   drawMap(scale2.s, scale2.w, scale2.h)
-  statusText()
+  mainText()
 }
 
-function statusText(){
+function mainText(){
   let curFood= playerData.supplies["Food"].n,
   camelFeed= playerData.supplies["CamelFeed"].n,
   curWater = playerData.supplies["WaterSkins"].n,
@@ -360,14 +384,48 @@ function statusText(){
   left = c.w*.15,
   right = c.w*.8
 
-  tx("Date: "+date, left, c.h*.1+mob, 2, 'DarkSlateGrey')
-  tx("Next City: "+distCity+" miles", left, c.h*.15+mob, 2, 'DarkSlateGrey')
-  tx("Traveled: "+totalTraveled+" miles", left, c.h*.2+mob, 2, 'DarkSlateGrey')
-  tx("Weather: "+weather, left, c.h*.25+mob, 2, 'DarkSlateGrey')
-  tx("Health: "+health, right, c.h*.1+mob, 2, 'DarkSlateGrey')
-  tx("Food: "+curFood+" lbs", right, c.h*.15+mob, 2, 'DarkSlateGrey')
-  tx("Camel Feed: "+camelFeed+" lbs", right, c.h*.2+mob, 2, 'DarkSlateGrey')
-  tx("Water: "+curWater+" skins", right, c.h*.25+mob, 2, 'DarkSlateGrey')
+  tx("Date: "+date, left, c.h*.1+mob, 2, colors[2])
+  tx("Next City: "+distCity+" miles", left, c.h*.15+mob, 2, colors[2])
+  tx("Traveled: "+totalTraveled+" miles", left, c.h*.2+mob, 2, colors[2])
+  tx("Weather: "+weather, left, c.h*.25+mob, 2, colors[2])
+  tx("Health: "+health, right, c.h*.1+mob, 2, colors[2])
+  tx("Food: "+curFood+" lbs", right, c.h*.15+mob, 2, colors[2])
+  tx("Camel Feed: "+camelFeed+" lbs", right, c.h*.2+mob, 2, colors[2])
+  tx("Water: "+curWater+" skins", right, c.h*.25+mob, 2, colors[2])
+  
+}
+
+function statusPage(){
+  let left = c.w*.2,
+  right = c.w*.4
+  mob = mobile?c.h/3:0, 
+  H = c.h*.1
+
+  tx("Supplies", left, H+mob, 3.5, colors[3])
+  H+=c.h*.05
+  for(item in playerData.supplies){
+    H+=c.h*.05
+    tx(item+": "+playerData.supplies[item].n, left, H+mob, 2, colors[2])
+  }
+
+  H = c.h*.1  
+  tx("Caravan Members", right, H+mob, 3.5, colors[3], "left")
+  H+=c.h*.1
+  tx("Name", right, H+mob, 2.5, colors[3], "left")
+  tx("Health", right+c.w*.2, H+mob, 2.5, colors[3], "left")
+  tx("Illness", right+c.w*.35, H+mob, 2.5, colors[3], "left")
+  for(mem in playerData.members){
+    H+=c.h*.05
+    let h = playerData.members[mem].health
+    h = h> 2 ? "good" : h >1 ? "fair" : h>0 ? "poor" : "dead"
+    tx(mem, right, H+mob, 2.5, colors[2], "left")
+    tx(h, right+c.w*.2, H+mob, 2.5, colors[2], "left")
+    tx(playerData.members[mem].ill, right+c.w*.35, H+mob, 2.5, colors[2],"left")
+  }
+  H=c.h*.55
+  tx("Pace", right-5, H+mob-5, 3, colors[3], "left")
+  tx("Rations", right+c.w*.15-5, H+mob-5, 3, colors[3], "left")
+  tx("Load", right+c.w*.3-5, H+mob-5, 3, colors[3], "left")
   
 }
 
@@ -396,8 +454,8 @@ function city(){
   let sx = curStep<7 ? curStep*80 : (curStep-7)*80
   let sy = curStep<7 ? 0 : 75
   c.drawImage(cities,sx,sy, 80, 75, c.w/2-80*3/2, c.h/2-75*3/2+20, 80*3, 75*3)
-  tx(steps[curStep].name, c.w / 2, c.h * .15, 6, '#E35A31')
-  tx(steps[curStep].country, c.w / 2, c.h * .25, 4, '#E35A31')
+  tx(steps[curStep].name, c.w / 2, c.h * .15, 6, colors[3])
+  tx(steps[curStep].country, c.w / 2, c.h * .25, 4, colors[3])
 }
 
 // time-based events - stops when hunting or in city 
@@ -405,7 +463,7 @@ function moving(){
   if(timerStatus==="elapsed"){
     dayPasses()
 
-    if(state==="moving"){
+    if(state==="moving" && playerData.supplies["Camels"].n>0){
       // movement along path
       playerData.currLeg += camelPace[playerData.settings.pace]
       playerData.totalTraveled += camelPace[playerData.settings.pace]
@@ -427,7 +485,7 @@ function moving(){
       return
     }
     if(
-        playerData.supplies["Food"].n<1 
+        playerData.supplies["CamelFeed"].n<1 
       && playerData.supplies["Camels"].n>0 
       && (Math.random()*10<1)
     ){
@@ -477,6 +535,7 @@ function moving(){
       timerStatus="off"
       state="city"
       refillWater()
+      updatePrices()
       s=6, changeText(steps[curStep].desc)
       buttons[8].label="Continue"
     }else{
@@ -520,6 +579,14 @@ function addDays(date, days) {
   return result;
 }
 
+function updatePrices(){
+  for(item in playerData.supplies){
+    let pChange = Math.random()*2
+    playerData.supplies[item].cost = playerData.supplies[item].cost*pChange
+  }
+  playerData.supplies["TradeGoods"].cost+=50
+}
+
 function newEvent(e){
   latestEvent = e
   log.push(playerData.date.toDateString()+" : "+e)
@@ -544,7 +611,7 @@ function randomEvent(){
 }
 
 function memDied(){
-  if(Math.random()*(playerData.rations==="good"? 10 : 5) < 2){
+  if(Math.random()*(playerData.rations==="good"? 10 : 5) < 1){
     let who = randProp(playerData.members)
     if(who.health>0){
     who.health = 0
@@ -616,9 +683,9 @@ function refillWater(){
 
 function hunt(){
   let arrows = playerData.supplies.Arrows.n
-  tx("Hunting", c.w / 2, c.h * .34, 5.3, '#E35A31')
-  tx("Arrows: "+arrows, c.w / 2, c.h *.45, 3, '#E35A31')
-  tx("Killed: "+playerData.hunt+" lbs", c.w / 2, c.h *.55, 3, '#E35A31')
+  tx("Hunting", c.w / 2, c.h * .34, 5.3, colors[3])
+  tx("Arrows: "+arrows, c.w / 2, c.h *.45, 3, colors[3])
+  tx("Killed: "+playerData.hunt+" lbs", c.w / 2, c.h *.55, 3, colors[3])
   if(arrows>0){
     bow()
   }
@@ -632,7 +699,7 @@ function animals(){
   for(an of animalArr){
     if(an.v&& an.alive){
       c.textBaseline='middle'
-      tx(an.t, an.x, an.y, 5.3, '#E35A31')
+      tx(an.t, an.x, an.y, 5.3, colors[3])
       c.textBaseline='alphabetic'
       an.y+=an.s
       if(an.y<10||an.y>c.h*.9){
@@ -726,27 +793,27 @@ function defend(){
 
 // might need to modify if price goes up and down along the wayToDo 
 function shop(){
-  tx("Shop", c.w / 2, c.h * .1, 5.3, '#E35A31')
+  tx("Shop", c.w / 2, c.h * .1, 5.3, colors[3])
   let H=c.h*.19
   sum = 0
-  tx("Item", c.w*.2, H, 4,'DarkSlateGrey')
-  tx("$", c.w*.35, H, 4,'DarkSlateGrey')
-  tx("Num", c.w*.45, H, 4,'DarkSlateGrey')
-  tx("Value", c.w*.55, H, 4, 'DarkSlateGrey')
+  tx("Item", c.w*.2, H, 4,colors[2])
+  tx("$", c.w*.35, H, 4,colors[2])
+  tx("Num", c.w*.45, H, 4,colors[2])
+  tx("Value", c.w*.55, H, 4, colors[2])
   H+=c.h*.06
 for(item in playerData.supplies){
-  tx(item, c.w*.2, H, 3, '#E35A31')
-  tx(playerData.supplies[item].cost, c.w*.35, H, 3, '#E35A31')
-  tx(playerData.supplies[item].n, c.w*.45, H, 3, 'DarkSlateGrey')
+  tx(item, c.w*.2, H, 3, colors[3])
+  tx(playerData.supplies[item].cost, c.w*.35, H, 3, colors[3])
+  tx(playerData.supplies[item].n, c.w*.45, H, 3, colors[2])
   let value = playerData.supplies[item].n/playerData.supplies[item].q*playerData.supplies[item].cost << 0
-  tx(value, c.w*.55, H, 3, 'DarkSlateGrey')
+  tx(value, c.w*.55, H, 3, colors[2])
   H+=c.h*.06
   sum+=value
 }
 H+=c.h*.05
-tx("Total "+sum+"$", c.w*.5, H, 3, 'DarkSlateGrey')
+tx("Total "+sum+"$", c.w*.5, H, 3, colors[2])
 H+=c.h*.05
-tx("You have "+playerData.money+"$", c.w*.5, H, 3, 'DarkSlateGrey')
+tx("You have "+playerData.money+"$", c.w*.5, H, 3, colors[2])
 }
 
 function map(){
@@ -754,7 +821,7 @@ function map(){
   c.fillStyle = "lightblue"
   c.fillRect(0, 0, c.w, c.h)
   drawMap(scale1.s, scale1.w, scale1.h)
-  tx("Map", c.w / 2, c.h * .1, 5.3, '#E35A31')
+  tx("Map", c.w / 2, c.h * .1, 5.3, colors[3])
 }
 function drawMap(size, tX, tY){
   // draw map
@@ -767,10 +834,10 @@ function drawMap(size, tX, tY){
     c.translate(tX, tY) // Adjust the x-coordinates to center
 
     if (i === svg.length - 1) {
-      c.strokeStyle = "DarkSlateGrey" // line for route
+      c.strokeStyle = colors[2] // line for route
       c.stroke(path)
 
-      c.strokeStyle = "DarkGoldenRod" // line for progress
+      c.strokeStyle = colors[1] // line for progress
       steps.forEach(step=>{
         drawPercentOfLine(step.start.x, step.start.y, step.end.x, step.end.y, step.percentage)
       })
@@ -801,10 +868,10 @@ function lose(){
   timerStatus="off"
   state="lose"
   let ht = c.h/4
-  tx("All your members are dead, you lose!",c.w/2, ht, 4, "DarkSlateGrey")
+  tx("All your members are dead, you lose!",c.w/2, ht, 4, colors[2])
   Object.values(playerData.members).forEach((mem)=>{
     ht+=c.h*.1
-    tx(mem.k+" died of "+mem.ill+"!",c.w/2, ht, 3, "DarkSlateGrey")
+    tx(mem.k+" died of "+mem.ill+"!",c.w/2, ht, 3, colors[2])
   })
 }
 
@@ -827,8 +894,8 @@ function start() {
     reqAnimationId = requestAnimationFrame(smoothAnimation)
 }
 
-function tx(t, w, h, f, s) {
-    c.textAlign = 'center'
+function tx(t, w, h, f, s, a) {
+    c.textAlign = a || 'center'
     c.fillStyle = s
     c.font = txScale*f + 'vw Consolas'
     c.fillText(t, w, h)
