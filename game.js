@@ -319,6 +319,10 @@ function smoothAnimation(e) {
         case 7: lose()
           break
         case 8: statusPage()
+          break
+        case 10: winScreen()
+          break
+
     }
     if(state==="moving"||state==="rest"){moving()}
     drawButtons()
@@ -887,6 +891,14 @@ function lose(){
 }
 
 function win(){
+ s=10
+// change the music
+p1`240.40
+R-RTV-TRW-VTV-V-T-VWV-TR
+M-MQR-Q R-RQR-R-Q-R-R-Q `
+}
+
+function winScreen(){
 //TODO: what happens at end
 }
 
