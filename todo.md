@@ -1,24 +1,26 @@
 # Do Important* first to have a complete game
 
 <!-- Next -->
-[] Event to tell you your camels died and your stranded
-[] resting shouldn't heal thirst
+
 
 <!-- Picky -->
 [] Balance random events
-[] If only 1 member left they can only die from sickness not random death
-[] change weather
-[] Make buttons you can't use show up brown
-the city page
-[] show dark when resting
 [] hover over buttons to see what city
 [] on lose screen make background dark and writing light like gravestone
 [] Game Over win *
 [] Talk
 [] scroll through logs
+[] Make load matter in game by making camels only carry a certain amount each
+[x] Make weather changes effect things
+[x] change weather
+[x] If only 2 members left they can only die from sickness not random death
+[x] show dark when resting
+[x] Make buttons you can't use show up grey
+[x] resting shouldn't heal thirst
+[x] When changing price round
 [x] Make value of objects change at each city
 [x] camels can die too if you run out of food
-[x] If you have no camels you can't keep moving
+[x] If you have no camels you go very slow
 [x] keep track of water consumption / stops to refill
 [x] Each day rested gives you a change of healing one member
 [x] make random events

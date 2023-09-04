@@ -20,7 +20,7 @@ var txScale = mobile ? 1.4 : 1
 var travelTimer
 var timerStatus="off"
 const colors = ["GoldenRod","DarkGoldenRod", "DarkSlateGrey", '#E35A31']
-
+const weather = ["Sunny", "Cloudy", "Raining", "Storm"]
 const cities = new Image()
 
 cities.src = "cities.png"
@@ -46,7 +46,7 @@ const playerData = {
     load:"medium"
   },
   dead:0,
-  weather:"good",
+  weather:"Sunny",
   currLeg:0,
   totalTraveled: 0
 }
@@ -55,7 +55,7 @@ playerData.date = new Date('1271-05-01')
 
 const camelPace = {slow:18, steady: 40, fast:70}
 const camelLoad = {light:150, medium:250, heavy:450}
-const eating = {poor:1, moderate:3, filling:5}
+const eating = {poor:1, good:3, filling:5}
 
 const lastPathSVG = svg[svg.length - 1];
 var temp = {x: 0, y:0}
@@ -103,7 +103,7 @@ var log=[] // Too keep track of all events
 
 // Button class
 class Button {
-  constructor(x, y, width, height, label, scene, onClick) {
+  constructor(x, y, width, height, label, scene, onClick, color) {
     this.x = x
     this.y = y
     this.width = width
@@ -112,11 +112,13 @@ class Button {
     this.isClicked = false
     this.s = scene
     this.onClick = onClick
+    this.color = color || colors[0]
+    this.active = true
   }
 
   draw() {
-    c.fillStyle = this.isClicked ? colors[0] : colors[1];
-    c.fillStyle = colors[0]
+    //c.fillStyle = this.isClicked ? colors[1] : colors[0]
+    c.fillStyle = this.active ? this.color : "grey"
     c.shadowColor = "rgba(0, 0, 0, 0.3)"
     c.shadowBlur = 6
     c.shadowOffsetX = 3
@@ -148,9 +150,10 @@ function setButtons(){
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
       // very first scene should be s2: choose members 
-      s=2, inputView(true), changeText(pageText[s])
+      //s=2, inputView(true), changeText(pageText[s])
         
-      //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
+      s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
+      //s=8
       // music
         p0`240
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
@@ -213,21 +216,17 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }),      
       new Button(bCen, mapH+bH+5, bW, bH, "Continue", 4, ()=>{
         if(state==="runningOut"){return}
+        buttons[9].active=false
+        buttons[5].active=true
         buttons[8].label ==="Rest" ? newEvent("Having a little rest."):newEvent("On the move again!")
         state=(buttons[8].label ==="Rest")? "rest":"moving"
         buttons[8].label=(buttons[8].label ==="Rest")? "Continue":"Rest"
-      }),
+        buttons[8].color= state==="moving" ? colors[0] : colors [1]
+      }, colors[1]),
       new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Shop!", 4, ()=>{
         if(state==='city'){
           s=3
           toggleTextContainer(false)
-        }else{
-          alert("Can only visit shop in city!")
-        }
-      }),
-      new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Shop!", 4, ()=>{
-        if(state==='city'){
-          s=3, toggleTextContainer(false)
         }else{
           alert("Can only visit shop in city!")
         }
@@ -242,16 +241,18 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         changeText(pageText[s])
       }),
       new Button(c.w*.4, c.h*.55, bW*.7, bH*.7, playerData.settings["pace"], 8, ()=>{
-        flipSetting(13,["slow","steady","fast"], "pace")
+        flipSetting(12,["slow","steady","fast"], "pace")
       
       }),
       new Button(c.w*.55, c.h*.55, bW*.7, bH*.7, playerData.settings["rations"], 8, ()=>{
-        flipSetting(14,["poor","moderate","filling"], "rations")
+        flipSetting(13,["poor","good","filling"], "rations")
       }),
       new Button(c.w*.7, c.h*.55, bW*.7, bH*.7, playerData.settings["load"], 8, ()=>{
-        flipSetting(15,["light","medium","heavy"], "load")
+        flipSetting(14,["light","medium","heavy"], "load")
       }),
       )
+  buttons[5].active=false // hunting in city not ok
+  
   var H=c.h*.22
   for(item in playerData.supplies){
     buttons.push(
@@ -462,16 +463,22 @@ function moving(){
   if(timerStatus==="elapsed"){
     dayPasses()
 
-    if(state==="moving" && playerData.supplies["Camels"].n>0){
+    if(state==="moving"){
       // movement along path
-      playerData.currLeg += camelPace[playerData.settings.pace]
-      playerData.totalTraveled += camelPace[playerData.settings.pace]
+      let currPace = playerData.supplies["Camels"].n>0 ? camelPace[playerData.settings.pace] : 5
+      if(playerData.weather==="Storm"){
+        newEvent("Storm slows us down to half pace!")
+        currPace/=2
+      }
+      playerData.currLeg += currPace
+      playerData.totalTraveled += currPace
       steps[curStep].percentage = playerData.currLeg/steps[curStep+1].miles
 
       if(dEvent<distBasedEvents.length && playerData.totalTraveled >= distBasedEvents[dEvent].d){
         newEvent(distBasedEvents[dEvent].t )
         dEvent++
       }
+
     }else{
       heal()
     }
@@ -535,6 +542,8 @@ function moving(){
       state="city"
       refillWater()
       updatePrices()
+      buttons[5].active=false
+      buttons[9].active=true
       s=6, changeText(steps[curStep].desc)
       buttons[8].label="Continue"
     }else{
@@ -549,11 +558,12 @@ function moving(){
 
 // hunting takes 1 day
 function dayPasses(){
+  playerData.weather = Math.random()>.5 ? weather[Math.random()*weather.length<<0] : playerData.weather
   playerData.date = addDays(playerData.date, 1)
   // supplies consumed
   playerData.supplies["Food"].n-= eating[playerData.settings.rations]*(5-playerData.dead) 
   playerData.supplies["CamelFeed"].n-= eating[playerData.settings.rations]*3*playerData.supplies["Camels"].n
-  if(playerData.supplies["WaterSkins"].n>0){
+  if(playerData.supplies["WaterSkins"].n>0 && playerData.weather!=="Raining"){
     playerData.supplies["WaterSkins"].n-= (5-playerData.dead)
     playerData.supplies["WaterSkins"].e+= (5-playerData.dead)
     if(playerData.supplies["WaterSkins"].n<0){
@@ -581,7 +591,7 @@ function addDays(date, days) {
 function updatePrices(){
   for(item in playerData.supplies){
     let pChange = Math.random()*2
-    playerData.supplies[item].cost = playerData.supplies[item].cost*pChange
+    playerData.supplies[item].cost = playerData.supplies[item].cost*pChange<<0
   }
   playerData.supplies["TradeGoods"].cost+=50
 }
@@ -595,7 +605,7 @@ function newEvent(e){
 function randomEvent(){
   let rand = Math.random() * eventArr.length << 0
   switch (rand) {
-    case 0: memDied()
+    case 0: playerData.dead<4 && memDied()
       break
     case 1: newEvent("Stopped at an oasis to refill water!")
             refillWater()
@@ -628,7 +638,7 @@ function memDied(){
 }
 
 function memSick(){
-  if(Math.random()*(playerData.rations==="good"? 10 : 5) < 4){
+  if(Math.random()*(playerData.rations==="filling"? 12 : playerData.rations==="filling"? 8 : 5) < 5){
   let who = randProp(playerData.members)
   if(who.health>0){
     who.health--
@@ -645,7 +655,7 @@ function memSick(){
 
 const heal = () =>{
   let who = randProp(playerData.members)
-    if(who.health>0 && who.health<3){
+    if(who.health>0 && who.health<3 && who.ill !== "thirst"){
       who.health++
       if(who.ill!=="none"){
         newEvent(who.k+" is no longer sick from "+who.ill)
