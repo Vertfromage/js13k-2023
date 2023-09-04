@@ -26,8 +26,8 @@ const cities = new Image()
 cities.src = "cities.png"
 
 const playerData = {
-  //members : {},
-  members:{"Joey":{health:3, ill:"none"},"Floe":{health:2, ill:"none"},"Stan":{health:1, ill:"none"},"Christopher":{health:3, ill:"none"},"Theodore":{health:0, ill:"none"}},
+  members : {},
+  //members:{"Joey":{health:3, ill:"none"},"Floe":{health:2, ill:"none"},"Stan":{health:1, ill:"none"},"Christopher":{health:3, ill:"none"},"Theodore":{health:0, ill:"none"}},
   money: 2000,
   hunt:0,
   supplies : {
@@ -150,12 +150,12 @@ function setButtons(){
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
       // very first scene should be s2: choose members 
-      //s=2, inputView(true), changeText(pageText[s])
+      s=2, inputView(true), changeText(pageText[s])
         
-      s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
+      //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
       //s=8
       // music
-        p0`240
+        p1`240.40
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
 J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|
 `
@@ -350,7 +350,8 @@ function title() {
 }
 
 function setup(){
-  tx("Members of Caravan?", c.w / 2, c.h * .34, 5.3, colors[3])
+  let num = 5-Object.keys(playerData.members).length
+  tx("Add "+num+" Members to Caravan!", c.w / 2, c.h * .34, 5.3, colors[3])
 }
 const changeWeather = () =>{
   let ran = Math.floor((Math.random() * 3))
