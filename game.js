@@ -155,7 +155,7 @@ function setButtons(){
       //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
       //s=8
       // music
-        p0`240
+        p1`240.40
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
 J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|
 `
@@ -350,7 +350,8 @@ function title() {
 }
 
 function setup(){
-  tx("Members of Caravan?", c.w / 2, c.h * .34, 5.3, colors[3])
+  let num = 5-Object.keys(playerData.members).length
+  tx("Add "+num+" Members to Caravan!", c.w / 2, c.h * .34, 5.3, colors[3])
 }
 const changeWeather = () =>{
   let ran = Math.floor((Math.random() * 3))

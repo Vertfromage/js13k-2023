@@ -11,6 +11,8 @@
 [] Talk
 [] scroll through logs
 [] Make load matter in game by making camels only carry a certain amount each
+[] First leg of the journey should not rely on camels for pace... should be ship pace.
+[] When weather switches from storm it should say weather improves
 [x] Make weather changes effect things
 [x] change weather
 [x] If only 2 members left they can only die from sickness not random death
