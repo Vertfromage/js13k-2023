@@ -5,7 +5,6 @@
 
 <!-- Picky -->
 [] Balance random events
-[] hover over buttons to see what city
 [] on lose screen make background dark and writing light like gravestone
 [] Game Over win *
 [] Talk
@@ -56,6 +55,7 @@
 [] technically you shouldn't die of anything other than ship wreck on first leg of journey
 [] pick up random member in a city... cool idea (remember we hard coded the party as 5 multiple times though...)
 [] How much camels can carry effects how much you can carry
+[] hover over buttons to see what city
 
 <!-- Hard -->
 [x] Hunting mini game
