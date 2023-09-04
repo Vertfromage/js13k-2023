@@ -26,19 +26,19 @@ const cities = new Image()
 cities.src = "cities.png"
 
 const playerData = {
-  //members : {},
-  members:{"Joey":{health:3, ill:"none"},"Floe":{health:2, ill:"none"},"Stan":{health:1, ill:"none"},"Christopher":{health:3, ill:"none"},"Theodore":{health:0, ill:"none"}},
+  members : {},
+  //members:{"Joey":{health:3, ill:"none"},"Floe":{health:2, ill:"none"},"Stan":{health:1, ill:"none"},"Christopher":{health:3, ill:"none"},"Theodore":{health:0, ill:"none"}},
   money: 2000,
   hunt:0,
   supplies : {
-    Camels: {n:2, q:1,  cost:100},
-    CamelFeed: {n:500, q:50, cost:10},
-    Food: {n:500, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
-    Clothing: {n:3,q:1, cost:10},
-    WaterSkins: {n:200, e:0, q:20, cost:5},
-    TradeGoods: {n:100,q:10, cost:100}, 
-    Arrows: {n:60, q:20, cost:10},
-    Tents: {n:3,q:1, cost:20}
+    Camels: {n:0, q:1,  cost:100},
+    CamelFeed: {n:0, q:50, cost:10},
+    Food: {n:0, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
+    Clothing: {n:0,q:1, cost:10},
+    WaterSkins: {n:0, e:0, q:20, cost:5},
+    TradeGoods: {n:0,q:10, cost:100}, 
+    Arrows: {n:0, q:20, cost:10},
+    Tents: {n:0,q:1, cost:20}
   },
   settings : {
     pace: "fast",
@@ -148,10 +148,9 @@ function setButtons(){
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
       // very first scene should be s2: choose members 
-      //s=2, inputView(true), changeText(pageText[s])
+      s=2, inputView(true), changeText(pageText[s])
         
       //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
-      s=8
       // music
         p0`240
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
