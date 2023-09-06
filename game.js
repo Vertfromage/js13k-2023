@@ -31,14 +31,14 @@ const playerData = {
   money: 2000,
   hunt:0,
   supplies : {
-    Camels: {n:0, q:1,  cost:100},
-    CamelFeed: {n:0, q:50, cost:10},
-    Food: {n:0, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
-    Clothing: {n:0,q:1, cost:10},
-    WaterSkins: {n:0, e:0, q:20, cost:5},
-    TradeGoods: {n:0,q:10, cost:100}, 
-    Arrows: {n:0, q:20, cost:10},
-    Tents: {n:0,q:1, cost:20}
+    Camels: {n:2, q:1,  cost:100},
+    CamelFeed: {n:400, q:50, cost:10},
+    Food: {n:400, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
+    Clothing: {n:2,q:1, cost:10},
+    WaterSkins: {n:100, e:0, q:20, cost:5},
+    TradeGoods: {n:100,q:10, cost:100}, 
+    Arrows: {n:50, q:20, cost:10},
+    Tents: {n:2,q:1, cost:20}
   },
   settings : {
     pace: "fast",
@@ -48,7 +48,8 @@ const playerData = {
   dead:0,
   weather:"Sunny",
   currLeg:0,
-  totalTraveled: 0
+  totalTraveled: 0,
+  score: 0
 }
 const mouse = {x:0, y:0}
 playerData.date = new Date('1271-05-01')
@@ -96,7 +97,7 @@ const commonIllnesses = [
 const eventArr = ["death", "water", "sick", "rob", "attack"]
 const distBasedEvents = [{d:20, t:"You board a ship for the first leg of your journey from Venice to Acre."},]
 var dEvent = 0
-const pageText =['','This is the map!',"Input your caravan member's names!", '',"Control your journey by making wise decisions!", "You can only carry 200lbs! Use as few arrows as possible!"]
+const pageText =['',"Follow Marco Polo's route along the silk road!","Input your caravan member's names!", '',"Control your journey by making wise decisions!", "You can only carry 200lbs! Use as few arrows as possible!"]
 var latestEvent = ""
 var log=[]//"test0","test1", "test2","test3","test4","test5","test6","test7","test8", "test9"] // Too keep track of all events
 
@@ -142,6 +143,7 @@ class Button {
 const buttons = []
 var lStart = 0
 var lEnd = 5
+var firstShop = true
 
 function setButtons(){
   var bW = mobile ? 250 : 200
@@ -177,6 +179,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
           state="rest"
           timerStatus="off"
         }
+        state="moving"
         s=4
         changeText(pageText[s])
         dayPasses() 
@@ -189,7 +192,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }),
       new Button(bCen, mapH, bW, bH, "Hunt!", 4, ()=>{
         if(state!=='city'){
-          state="rest"
+          state="hunt"
           for(an of animalArr){
             an.v = Math.floor((Math.random() * 2))
             an.alive = true
@@ -211,6 +214,10 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         s=9, toggleTextContainer(false)
       }),      
       new Button(bCen, mapH+bH+5, bW, bH, "Continue", 4, ()=>{
+        if(state==="win"){
+          s=10
+          return
+        }
         if(state==="runningOut"){return}
         buttons[9].active=false
         buttons[5].active=true
@@ -230,6 +237,11 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       new Button(bCen, c.h*.7, bW, bH, "Overview!", 6, ()=>{
         s=4, changeText("Control your journey by making wise decisions!")
         toggleTextContainer(true), newEvent("You arrived in "+steps[curStep].name+", "+steps[curStep].country)
+        if(steps[curStep].name==="Pagan"){
+          //last city
+          state="win"
+          buttons[8].label="See Score"
+        }
       }),
       new Button(c.w*.4, c.h*.55, bW*.7, bH*.7, playerData.settings["pace"], 8, ()=>{
         flipSetting(12,["slow","steady","fast"], "pace")
@@ -286,7 +298,9 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
   }
   H+=c.h*.05
   buttons.push(new Button(c.w*.7, H, bW, bH, "Done!", 3, ()=>{
-    s=6, changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
+    if(firstShop) {s=6, firstShop=false, changeText(steps[curStep].desc)}
+    else {s=4}
+    state="city", toggleTextContainer(true) 
   }))
 }
 setButtons()
@@ -858,6 +872,16 @@ H+=c.h*.05
 tx("You have "+playerData.money+"$", c.w*.5, H, 3, colors[2])
 }
 
+function score(){
+  let sum=0
+  // what the value is of all their supplies
+  for(item in playerData.supplies){
+    let value = playerData.supplies[item].n/playerData.supplies[item].q*playerData.supplies[item].cost << 0
+    sum+=value
+  }
+  playerData.score = (sum + playerData.money )*(5-playerData.dead)
+}
+
 function map(){
   let scale1 = mobile ? {s:3,w: c.w*.1, h: 0} : {s:2,w: c.w*.2, h: -c.h*.08}
   c.fillStyle = "lightblue"
@@ -926,7 +950,9 @@ M-MQR-Q R-RQR-R-Q-R-R-Q `
 }
 
 function winScreen(){
-//TODO: what happens at end
+  tx("You Win!", c.w/2, c.h/2, 3, colors)
+  tx("Score: "+playerData.score )
+  //TODO: what happens at end
 }
 
 /** UTILS */

@@ -1,19 +1,14 @@
 # Do Important* first to have a complete game
 
 <!-- Next -->
-
+[] Balance random events
+[] Win Screen
 
 <!-- Picky -->
-[] Balance random events
-[] on lose screen make background dark and writing light like gravestone
-[] Game Over win *
-[] Talk
-[] Make load matter in game by making camels only carry a certain amount each
-[] First leg of the journey should not rely on camels for pace... should be ship pace.
-[] When weather switches from storm it should say weather improves
-[] If I need more room some buttons are the same might save space by having more than one scene they're shown on in button initiation
-[] log scroll buttons should change color if you can't scroll further
-[] should go from store to control page not from store to city unless first of game.
+[x] Make score more complicated than just how much money... 
+[x] should go from store to control page not from store to city unless first of game.
+[x] log scroll buttons should change color if you can't scroll further
+[x] When done hunting should go back to moving
 [x] Hunting should be added to logs
 [x] weather is being calculated badly
 [x] Having more than one event a day...
@@ -52,22 +47,28 @@
 [x] status page => health of members + quantity of each item ... could be store
 [x] ability to change pace/rations
 
-<!-- Fun but not necessary -->
-[] Raiders mini game
-[] Decentralized (nft?)
-[] Traveling caravan animation
+<!-- Nice to have but not necessary -->
 [] Choose profession
 [] Restart -> currently just refresh
 [] ship sinks is a tiny chance on the first leg of journey
 [] technically you shouldn't die of anything other than ship wreck on first leg of journey
 [] pick up random member in a city... cool idea (remember we hard coded the party as 5 multiple times though...)
 [] How much camels can carry effects how much you can carry
+[] Talk
+[] Make load matter in game by making camels only carry a certain amount each
+
+<!-- Cool but not necessary -->
+[] Raiders mini game
+[] Decentralized (nft?)
+[] Traveling caravan animation
 [] hover over buttons to see what city
+[] on lose screen make background a dark gravestone
 
 <!-- Hard -->
 [x] Hunting mini game
 [x] Mobile Friendly
 [x] Music
+[] If I need more room some buttons are the same might save space by having more than one scene they're shown on in button initiation
 
 
 
