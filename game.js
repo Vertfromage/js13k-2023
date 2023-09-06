@@ -179,7 +179,6 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
           state="rest"
           timerStatus="off"
         }
-        state="moving"
         s=4
         changeText(pageText[s])
         dayPasses() 
@@ -192,7 +191,6 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }),
       new Button(bCen, mapH, bW, bH, "Hunt!", 4, ()=>{
         if(state!=='city'){
-          state="hunt"
           for(an of animalArr){
             an.v = Math.floor((Math.random() * 2))
             an.alive = true
@@ -244,14 +242,14 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         }
       }),
       new Button(c.w*.4, c.h*.55, bW*.7, bH*.7, playerData.settings["pace"], 8, ()=>{
-        flipSetting(12,["slow","steady","fast"], "pace")
+        flipSetting(13,["slow","steady","fast"], "pace")
       
       }),
       new Button(c.w*.55, c.h*.55, bW*.7, bH*.7, playerData.settings["rations"], 8, ()=>{
-        flipSetting(13,["poor","good","filling"], "rations")
+        flipSetting(14,["poor","good","filling"], "rations")
       }),
       new Button(c.w*.7, c.h*.55, bW*.7, bH*.7, playerData.settings["load"], 8, ()=>{
-        flipSetting(14,["light","medium","heavy"], "load")
+        flipSetting(15,["light","medium","heavy"], "load")
       }),
       new Button(c.w*.4, c.h*.8, bW, bH, "Back!", 9, ()=>{
         s=4
@@ -931,7 +929,7 @@ start()
 
 function lose(){
   clearInterval(travelTimer)
-  timerStatus="off"
+  timerStatus="lose"
   state="lose"
   let ht = c.h/4
   tx("All your members are dead, you lose!",c.w/2, ht, 4, colors[2])
