@@ -8,10 +8,17 @@
 [] on lose screen make background dark and writing light like gravestone
 [] Game Over win *
 [] Talk
-[] scroll through logs
 [] Make load matter in game by making camels only carry a certain amount each
 [] First leg of the journey should not rely on camels for pace... should be ship pace.
 [] When weather switches from storm it should say weather improves
+[] If I need more room some buttons are the same might save space by having more than one scene they're shown on in button initiation
+[] log scroll buttons should change color if you can't scroll further
+[] should go from store to control page not from store to city unless first of game.
+[x] Hunting should be added to logs
+[x] weather is being calculated badly
+[x] Having more than one event a day...
+[x] enter to submit name
+[x] scroll through logs
 [x] Make weather changes effect things
 [x] change weather
 [x] If only 2 members left they can only die from sickness not random death
@@ -47,7 +54,7 @@
 
 <!-- Fun but not necessary -->
 [] Raiders mini game
-[] Decentralized (Score? Wiki? nft?)
+[] Decentralized (nft?)
 [] Traveling caravan animation
 [] Choose profession
 [] Restart -> currently just refresh

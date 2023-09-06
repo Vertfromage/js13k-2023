@@ -20,11 +20,11 @@ var txScale = mobile ? 1.4 : 1
 var travelTimer
 var timerStatus="off"
 const colors = ["GoldenRod","DarkGoldenRod", "DarkSlateGrey", '#E35A31']
-const weather = ["Sunny", "Cloudy", "Raining", "Storm"]
+
 const cities = new Image()
 
 cities.src = "cities.png"
-
+var arrowsUsed=0
 const playerData = {
   members : {},
   //members:{"Joey":{health:3, ill:"none"},"Floe":{health:2, ill:"none"},"Stan":{health:1, ill:"none"},"Christopher":{health:3, ill:"none"},"Theodore":{health:0, ill:"none"}},
@@ -98,7 +98,7 @@ const distBasedEvents = [{d:20, t:"You board a ship for the first leg of your jo
 var dEvent = 0
 const pageText =['','This is the map!',"Input your caravan member's names!", '',"Control your journey by making wise decisions!", "You can only carry 200lbs! Use as few arrows as possible!"]
 var latestEvent = ""
-var log=[] // Too keep track of all events
+var log=[]//"test0","test1", "test2","test3","test4","test5","test6","test7","test8", "test9"] // Too keep track of all events
 
 
 // Button class
@@ -140,12 +140,15 @@ class Button {
 }
 
 const buttons = []
+var lStart = 0
+var lEnd = 5
 
 function setButtons(){
   var bW = mobile ? 250 : 200
   var bH = mobile ? 70 : 60
   var mapH = (mobile ? c.h*.28+5 : c.h/3+5)+90
   var bCen = c.w*.5-bW*.5
+
   buttons.push(
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
@@ -153,7 +156,6 @@ function setButtons(){
       s=2, inputView(true), changeText(pageText[s])
         
       //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
-      //s=8
       // music
         p1`240.40
 c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
@@ -170,6 +172,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 5, ()=>{
         let amount = playerData.hunt<200 ? playerData.hunt : 200
         playerData.supplies.Food.n+= amount
+        newEvent("You used "+arrowsUsed+" arrows to hunt "+amount+" lbs of food.")
         if(state==="runningOut" && playerData.supplies.Food.n>50){
           state="rest"
           timerStatus="off"
@@ -179,15 +182,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         dayPasses() 
       }),
       new Button(c.w*.5-bW*.6, c.h*.6, bW*1.2, bH, "Add Member!", 2, ()=>{
-        if(txtInput.value.length>0){
-        // health: 0(dead), 1 (poor),2(fair), 3(good) 
-        playerData.members[txtInput.value] = {health:3, ill:"none"}
-        txtInput.value = ""
-        changeText("Caravan Members: "+Object.keys(playerData.members).toString())
-        if(Object.keys(playerData.members).length==5){
-          s=3, inputView(false), toggleTextContainer(false)
-        }
-      }
+        addMember()
       }),
       new Button(c.w*.5-bW*1.5-2, mapH, bW, bH, "Status!", 4, ()=>{
         s=8, changeText("Check on your supplies and party members!")
@@ -212,8 +207,8 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       new Button(c.w*.5+2+bW*.5, mapH, bW, bH, "Big Map!", 4, ()=>{
         s=1, changeText(pageText[s])
       }),
-      new Button(c.w*.5-bW*1.5-2, mapH+bH+5, bW, bH, "Interact!", 4, ()=>{
-        // talk or trade or make this button for the log
+      new Button(c.w*.5-bW*1.5-2, mapH+bH+5, bW, bH, "Logs!", 4, ()=>{
+        s=9, toggleTextContainer(false)
       }),      
       new Button(bCen, mapH+bH+5, bW, bH, "Continue", 4, ()=>{
         if(state==="runningOut"){return}
@@ -236,11 +231,6 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         s=4, changeText("Control your journey by making wise decisions!")
         toggleTextContainer(true), newEvent("You arrived in "+steps[curStep].name+", "+steps[curStep].country)
       }),
-      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 8, ()=>{
-        s=4
-        toggleTextContainer(true)
-        changeText(pageText[s])
-      }),
       new Button(c.w*.4, c.h*.55, bW*.7, bH*.7, playerData.settings["pace"], 8, ()=>{
         flipSetting(12,["slow","steady","fast"], "pace")
       
@@ -250,6 +240,22 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
       }),
       new Button(c.w*.7, c.h*.55, bW*.7, bH*.7, playerData.settings["load"], 8, ()=>{
         flipSetting(14,["light","medium","heavy"], "load")
+      }),
+      new Button(c.w*.4, c.h*.8, bW, bH, "Back!", 9, ()=>{
+        s=4
+        toggleTextContainer(true)
+        changeText(pageText[s])
+      }),
+      new Button(c.w*.9, c.h*.3, bW/3, bH*.8, "⬆", 9, ()=>{
+        lStart>0 && lStart-- && lEnd>5 && lEnd--
+      }),
+      new Button(c.w*.9, c.h*.6, bW/3, bH*.8, "⬇", 9, ()=>{
+        lEnd<log.length && lEnd++ && lStart<log.length-5 && lStart++ 
+      }),
+      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 8, ()=>{
+        s=4
+        toggleTextContainer(true)
+        changeText(pageText[s])
       }),
       )
   buttons[5].active=false // hunting in city not ok
@@ -286,6 +292,19 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
 setButtons()
 changeText("Embark on a journey along the Silk Road, making strategic decisions and overcoming challenges to successfully reach your destination in the East!")
 
+function addMember(){
+  if(txtInput.value.length>0){
+    // health: 0(dead), 1 (poor),2(fair), 3(good) 
+    playerData.members[txtInput.value] = {health:3, ill:"none"}
+    txtInput.value = ""
+    changeText("Caravan Members: "+Object.keys(playerData.members).toString())
+    if(Object.keys(playerData.members).length==5){
+      s=3, inputView(false), toggleTextContainer(false)
+    }
+  }
+}
+
+
 const inputView = (show) =>{
   txtInput.style.display = show ? "block" : "none";
 }
@@ -320,6 +339,8 @@ function smoothAnimation(e) {
           break
         case 8: statusPage()
           break
+        case 9: logs(lStart,lEnd)
+          break
         case 10: winScreen()
           break
 
@@ -343,6 +364,7 @@ onclick = e => {
             arrow.x= rope.x,arrow.y=arc.y-3
             arrow.set = false
             playerData.supplies.Arrows.n--
+            arrowsUsed++
           }
           break;
     }
@@ -357,10 +379,13 @@ function title() {
 function setup(){
   let num = 5-Object.keys(playerData.members).length
   tx("Add "+num+" Members to Caravan!", c.w / 2, c.h * .34, 5.3, colors[3])
+  if(k[13]){
+    addMember()
+  }
 }
 const changeWeather = () =>{
-  let ran = Math.floor((Math.random() * 3))
-  playerData.weather= ran==2 ? "good" : ran==1 ? "fair" : "bad"
+  let ran = Math.random() * 100
+  playerData.weather= ran<60 ? "Sunny" : ran<75 ? "Cloudy" : ran<95 ? "Raining" : "Storm"
 }
 
 function mainPage(){
@@ -564,7 +589,7 @@ function moving(){
 
 // hunting takes 1 day
 function dayPasses(){
-  playerData.weather = Math.random()>.5 ? weather[Math.random()*weather.length<<0] : playerData.weather
+  changeWeather()
   playerData.date = addDays(playerData.date, 1)
   // supplies consumed
   playerData.supplies["Food"].n-= eating[playerData.settings.rations]*(5-playerData.dead) 
@@ -603,8 +628,10 @@ function updatePrices(){
 }
 
 function newEvent(e){
-  latestEvent = e
-  log.push(playerData.date.toDateString()+" : "+e)
+  setTimeout(()=>{
+    latestEvent = e
+    log.push(playerData.date.toDateString()+" : "+e)
+  },1000)
   //console.log(log)
 }
 
@@ -975,6 +1002,20 @@ function drawPercentOfLine( x1, y1, x2, y2, percentage) {
   c.stroke()
   c.lineWidth=1
 }
+
+function logs(start, end){
+  if(end>log.length){end=log.length}
+  tx("Travel Logs", c.w/2, c.h*.15 , 4, colors[3])
+  H=c.h*.3
+  for(i=start;i<end;i++){
+    tx(log[i], c.w/2, H , 2, colors[2])
+    H+=c.h*.1
+  }
+  // button active
+  buttons[15].active = start!==0
+  buttons[16].active = end!==log.length 
+  
+} 
 
 const touch =(x1,y1,x2,y2, d) =>{
   return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2) < d
