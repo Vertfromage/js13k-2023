@@ -5,6 +5,9 @@
 [] Win Screen
 
 <!-- Picky -->
+[] If sick with thirst when water is found heal that and increase health by 1
+[] Going too fast too long should cause problems
+[] don't seem to be stopping while hunting
 [x] Make score more complicated than just how much money... 
 [x] should go from store to control page not from store to city unless first of game.
 [x] log scroll buttons should change color if you can't scroll further

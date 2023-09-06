@@ -175,8 +175,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         let amount = playerData.hunt<200 ? playerData.hunt : 200
         playerData.supplies.Food.n+= amount
         newEvent("You used "+arrowsUsed+" arrows to hunt "+amount+" lbs of food.")
-        if(state==="runningOut" && playerData.supplies.Food.n>50){
-          state="rest"
+        if(playerData.supplies.Food.n>50){
           timerStatus="off"
         }
         s=4
@@ -190,7 +189,10 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         s=8, changeText("Check on your supplies and party members!")
       }),
       new Button(bCen, mapH, bW, bH, "Hunt!", 4, ()=>{
+        buttons[8].label="Continue"
+        buttons[8].color= colors [1]
         if(state!=='city'){
+          state="hunt"
           for(an of animalArr){
             an.v = Math.floor((Math.random() * 2))
             an.alive = true
@@ -585,8 +587,8 @@ function moving(){
       state="city"
       refillWater()
       updatePrices()
-      buttons[5].active=false
-      buttons[9].active=true
+      buttons[5].active=false // hunt
+      buttons[9].active=true // shop
       s=6, changeText(steps[curStep].desc)
       buttons[8].label="Continue"
     }else{
