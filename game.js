@@ -242,14 +242,14 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         }
       }),
       new Button(c.w*.4, c.h*.55, bW*.7, bH*.7, playerData.settings["pace"], 8, ()=>{
-        flipSetting(13,["slow","steady","fast"], "pace")
+        flipSetting(11,["slow","steady","fast"], "pace")
       
       }),
       new Button(c.w*.55, c.h*.55, bW*.7, bH*.7, playerData.settings["rations"], 8, ()=>{
-        flipSetting(14,["poor","good","filling"], "rations")
+        flipSetting(12,["poor","good","filling"], "rations")
       }),
       new Button(c.w*.7, c.h*.55, bW*.7, bH*.7, playerData.settings["load"], 8, ()=>{
-        flipSetting(15,["light","medium","heavy"], "load")
+        flipSetting(13,["light","medium","heavy"], "load")
       }),
       new Button(c.w*.4, c.h*.8, bW, bH, "Back!", 9, ()=>{
         s=4
