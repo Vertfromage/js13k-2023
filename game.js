@@ -31,14 +31,14 @@ const playerData = {
   money: 2000,
   hunt:0,
   supplies : {
-    Camels: {n:2, q:1,  cost:100},
-    CamelFeed: {n:400, q:50, cost:10},
-    Food: {n:400, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
-    Clothing: {n:2,q:1, cost:10},
-    WaterSkins: {n:100, e:0, q:20, cost:5},
-    TradeGoods: {n:100,q:10, cost:100}, 
-    Arrows: {n:50, q:20, cost:10},
-    Tents: {n:2,q:1, cost:20}
+    Camels: {n:0, q:1,  cost:100},
+    CamelFeed: {n:0, q:50, cost:10},
+    Food: {n:0, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
+    Clothing: {n:0,q:1, cost:10},
+    WaterSkins: {n:0, e:0, q:20, cost:5},
+    TradeGoods: {n:0,q:10, cost:100}, 
+    Arrows: {n:0, q:20, cost:10},
+    Tents: {n:0,q:1, cost:20}
   },
   settings : {
     pace: "fast",
