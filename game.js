@@ -283,6 +283,7 @@ function setButtons(){
       new Button(c.w*.93, c.h*.05, bW/4, bH*.8, "⛶", [0,2,4], ()=>{
         full ? document.exitFullscreen() : document.documentElement.requestFullscreen() 
         full = !full
+        resize()
       }),
       new Button(c.w*.93, c.h*.15, bW/4, bH*.8, "🔈", [2,4], ()=>{
         buttons[17].label= buttons[17].label==="🔈" ? "🔇":"🔈"
