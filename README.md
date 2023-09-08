@@ -3,6 +3,9 @@
 
 Embark on a journey along the Silk Road, making strategic decisions and overcoming challenges to successfully reach your destination in the East!
 
+# Decentralized Feature
+If you login 
+
 # Acknowledgements 
 Inspired by "The Oregon Trail" game
 
@@ -27,7 +30,4 @@ Song credit: "Strela Do Dia" by Alfonso X the Wise ~1270 AD
 City Images are derivatives of drawings created by Bing Image Creator simplified with GIMP and minified further on tinypng.com
 
 My Mom for helping me brainstorm game ideas and insisting that every game I made is mobile friendly so she can play it on her phone.
-
-
-
 

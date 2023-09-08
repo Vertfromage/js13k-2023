@@ -5,7 +5,6 @@
 
 <!-- Next -->
 [] Balance random events
-[] Win Screen
 
 <!-- Mobile -->
 [] Resize is buggy when I implement full screen
@@ -13,7 +12,12 @@
 <!-- Picky -->
 [] Going too fast too long should cause problems... 
 [] Prices should go down sometimes?? could hardcode price changes??
+[] Add more story line distance based events
 
+[x] When you arrive at a city anyone with thirst should heal
+[x] When under attack shouldn't keep moving
+[x] win screen should say how many miles and days you traveled
+[x] Win Screen
 [x] Too many deaths... only deaths if health !=good
 [x] double tap on mobile needs to be disabled.
 [x] Add some fun events...
@@ -70,7 +74,7 @@
 [x] ability to change pace/rations
 [x] full screen and music control buttons
 [x] Enter keycode doesn't work on mobile go button
-[] Map not centered right on mobile
+[x] Map not centered right on mobile
 
 <!-- Nice to have but not necessary -->
 [] Choose profession
@@ -81,10 +85,11 @@
 [] How much camels can carry effects how much you can carry
 [] Talk
 [] Make load matter in game by making camels only carry a certain amount each
+[] Lily refreshed by accident and lost progress... would need restart and local storage to fix this.
 
 <!-- Cool but not necessary -->
-[] Raiders mini game
-[] Decentralized (nft?)
+[x] Raiders mini game
+[x] Decentralized 
 [] Traveling caravan animation
 [] on lose screen make background a dark gravestone
 

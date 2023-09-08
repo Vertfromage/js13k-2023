@@ -16,6 +16,8 @@ document.getElementById("playerInput").addEventListener("keydown", (e) => {
   }
 })
 
+initializeNear()
+
 var gameOver=false
 var vertical = window.screen.width < 500 // For vertical view
 var thin = window.screen.height < 415
@@ -33,6 +35,10 @@ const cities = new Image()
 const eventQueue = []
 // var full = false
 var play = true
+var  nBadGuy=0
+var firstDay=new Date('1271-05-01')
+const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+
 
 
 cities.src = "cities.png"
@@ -43,18 +49,18 @@ const playerData = {
   money: 2000,
   hunt:0,
   supplies : {
-    Camels: {n:3, q:1,  cost:100},
-    CamelFeed: {n:500, q:50, cost:10},
-    Food: {n:500, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
-    Clothing: {n:3,q:1, cost:10},
-    WaterSkins: {n:140, e:0, q:20, cost:5},
-    TradeGoods: {n:100,q:10, cost:100}, 
-    Arrows: {n:40, q:20, cost:10},
-    Tents: {n:3,q:1, cost:20}
+    Camels: {n:0, q:1,  cost:100},
+    CamelFeed: {n:0, q:50, cost:10},
+    Food: {n:0, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
+    Clothing: {n:0,q:1, cost:10},
+    WaterSkins: {n:0, e:0, q:20, cost:5},
+    TradeGoods: {n:0,q:10, cost:100}, 
+    Arrows: {n:0, q:20, cost:10},
+    Tents: {n:0,q:1, cost:20}
   },
   settings : {
-    pace: "fast",
-    rations: "poor",
+    pace: "steady",
+    rations: "good",
     load:"medium"
   },
   dead:0,
@@ -80,7 +86,7 @@ lastPathSVG.split(" ").map((cor)=>{
     }
 })
 var curStep = 0
-const totalMiles = 12494
+const totalMiles = 14795
 const steps = [
   { name: 'Vanice', country:'Italy', desc: "Venice thrived as a trading hub and cultural center.", start: dots[0], end: dots[1], percentage: 0, miles: 1900},
   { name: 'Acre', country:'Israel', desc: "Bustling port city, a focal point of trade and cultural exchange.", start: dots[1], end: dots[2], percentage: 0, miles:950 },
@@ -107,7 +113,7 @@ const commonIllnesses = [
   'Respiratory Infection',  'Parasitic Infection',  'Venomous Snake Bite',  'Dengue Fever',
   'Hepatitis',  'Rabies'
 ]
-const eventArr = ["death", "water", "sick", "rob", "attack", "camel"]
+const eventArr = ["death", "water", "sick", "rob", "attack", "camel", "heal"]
 const distBasedEvents = [{d:20, t:"You board a ship for the first leg of your journey from Venice to Acre."},]
 var dEvent = 0
 const pageText =['',"Follow Marco Polo's route along the silk road!","Input your caravan member's names!", '',"Control your journey by making wise decisions!", "You can only carry 200lbs! Use as few arrows as possible!"]
@@ -130,6 +136,11 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
     p1`240.40
 R-RTV-TRW-VTV-V-T-VWV-TR
 M-MQR-Q R-RQR-R-Q-R-R-Q `
+  }
+  if(c==2){
+    p1`700.60
+V-Y-c-V-d---c-a-
+M-------R-------`
   }
 }
 
@@ -185,8 +196,14 @@ function setButtons(){
   buttons.push(
     // first screen button
     new Button(c.w*.4, c.h*.5, bW, bH, "Start!", [0], ()=>{
+      if(brownie){
+        playerData.members["Mr.Brown"] = {health:3, ill:"none", brown:true}
+        changeText("Caravan Members: "+Object.keys(playerData.members).toString())
+      }else{
+        changeText(pageText[s])
+      }
       // very first scene should be s2: choose members 
-      s=2, inputView(true), changeText(pageText[s])
+      s=2, inputView(true)
       //document.documentElement.requestFullscreen() //full screen by default
       // music
         musicPlay(0)
@@ -223,7 +240,7 @@ function setButtons(){
         if(state!=='city'){
           state="hunt"
           for(an of animalArr){
-            an.v = Math.floor((Math.random() * 2))
+            an.v = (Math.random() * 2)
             an.alive = true
             an.x = c.w*.2+Math.random()*c.w*.7
             an.y = c.h*.1+Math.random()*c.h*.6
@@ -245,6 +262,7 @@ function setButtons(){
       new Button(bCen, mapH+bH+5, bW, bH, "Continue", [4], ()=>{
         if(state==="win"){
           s=10
+          changeText("Congrats on the win! Refresh to replay!")
           return
         }
         if(state==="runningOut"){return}
@@ -298,6 +316,15 @@ function setButtons(){
         buttons[16].label= buttons[16].label==="🔈" ? "🔇":"🔈"
         buttons[16].label==="🔈" ? musicPlay(currSong) : musicStop()
       }),
+      new Button(c.w*.85, c.h*.05, bW*.7, bH*.8, "login", [0], ()=>{
+        buttons[17].label= loggedIn ? "logout" : "login"
+        if(loggedIn){
+          loggedIn=false
+          logOut()
+        }else{
+          login()
+        }        
+      }),
 
       )
   buttons[5].active=false // hunting in city not ok
@@ -337,9 +364,11 @@ setButtons()
 changeText("Embark on a journey along the Silk Road, making strategic decisions and overcoming challenges to successfully reach your destination in the East!")
 
 function addMember(){
-  if(txtInput.value.length>0){
+  let input = txtInput.value
+  
+  if(input.length>0){
     // health: 0(dead), 1 (poor),2(fair), 3(good) 
-    playerData.members[txtInput.value] = {health:3, ill:"none"}
+    playerData.members[input] = {health:3, ill:"none", brown:false}
     txtInput.value = ""
     changeText("Caravan Members: "+Object.keys(playerData.members).toString())
     if(Object.keys(playerData.members).length==5){
@@ -387,6 +416,8 @@ function smoothAnimation(e) {
           break
         case 10: winScreen()
           break
+        case 11: defend()
+          break
 
     }
     if(state==="moving"||state==="rest"){moving()}
@@ -404,6 +435,7 @@ onclick = e => {
         case 0: 
           break;
         case 5:
+        case 11:
           if(arrow.set&&playerData.supplies.Arrows.n>0){
             arrow.x= rope.x,arrow.y=arc.y-3
             arrow.set = false
@@ -484,21 +516,25 @@ function statusPage(){
   tx("Caravan Members", right, H+mob, 3.5, colors[3], "left")
   H+=c.h*.1
   tx("Name", right, H+mob, 2.5, colors[3], "left")
-  tx("Health", right+c.w*.1, H+mob, 2.5, colors[3], "left")
-  tx("Illness", right+c.w*.2, H+mob, 2.5, colors[3], "left")
+  tx("Health", right+c.w*.15, H+mob, 2.5, colors[3], "left")
+  tx("Illness", right+c.w*.25, H+mob, 2.5, colors[3], "left")
   for(mem in playerData.members){
     H+=c.h*.05
     let h = playerData.members[mem].health
     h = h> 2 ? "good" : h >1 ? "fair" : h>0 ? "poor" : "dead"
     tx(mem, right, H+mob, 2.5, colors[2], "left")
-    tx(h, right+c.w*.1, H+mob, 2.5, colors[2], "left")
-    tx(playerData.members[mem].ill, right+c.w*.2, H+mob, 2.5, colors[2],"left")
+    tx(h, right+c.w*.15, H+mob, 2.5, colors[2], "left")
+    tx(playerData.members[mem].ill, right+c.w*.25, H+mob, 2.5, colors[2],"left")
   }
   H=c.h*.55
   tx("Pace", right-5, H+mob-5, 3, colors[3], "left")
   tx("Rations", right+c.w*.15-5, H+mob-5, 3, colors[3], "left")
   tx("Load", right+c.w*.3-5, H+mob-5, 3, colors[3], "left")
   
+  if(loggedIn){
+    tx(userName, c.w*.02, c.h*.7, 2, colors[3], "left")
+    tx(brownNum+" Mr.Brown NFTs", c.w*.02, c.h*.8, 2, colors[3], "left")
+  }
 }
 
 const healthStatus = () =>{
@@ -512,7 +548,7 @@ const healthStatus = () =>{
   val =Math.ceil(val/(5-playerData.dead))
   
   switch(val){
-    case 0 : s=7
+    case 0 : s=7, musicPlay(2)
       changeText("This is the end... refresh to restart!")
       return
     case 1 : return "Poor"
@@ -703,23 +739,27 @@ function randomEvent(){
       break
     case 1: newEvent("Stopped at an oasis to refill water!")
             refillWater()
-            heal()
       break
     case 2: memSick()
       break
     case 3: robbed()
       break
-    case 4: //TODO: attack minigame
+    case 4: setEnemies()
+            s=11
       break
     case 5: newEvent("You find a lose camel")
             playerData.supplies["Camels"].n++
       break
+    case 6: heal()
 }
 }
 
 function memDied(){
   if(Math.random()*(Math.random()*(playerData.rations==="filling"? 12 : playerData.rations==="filling"? 8 : 5) < 5)){
     let who = randProp(playerData.members)
+    if(who.brown){
+      return // Mr.Brown doesn't die randomly!
+    }
     if(who.health>0 && who.health<3){
     who.health = 0
     let diedOf 
@@ -738,6 +778,9 @@ function memDied(){
 function memSick(){
   if(Math.random()*(playerData.rations==="filling"? 12 : playerData.rations==="filling"? 8 : 5) < 5){
   let who = randProp(playerData.members)
+  if(who.brown){
+    return // Mr.Brown doesn't randomly get sick
+  }
   if(who.health>0){
     who.health--
     if(who.health<1){
@@ -793,6 +836,12 @@ function robbed(){
 function refillWater(){
   playerData.supplies["WaterSkins"].n += playerData.supplies["WaterSkins"].e
   playerData.supplies["WaterSkins"].e=0
+
+  for(m in playerData.members){
+    if(playerData.members[m].ill==="thirst"){
+      playerData.members[m].ill="none"
+    }
+  }
 }
 
 function hunt(){
@@ -808,7 +857,7 @@ function hunt(){
 }
 
 var animalArr = [{t:"🐪", v:0, w:990},{t:"🐏", v:0, w:99},{t:"🦌", v:0, w:150,s:3}, {t:"🐇", v:0, w:11}]
-
+var badGArr =[{t:"👩🏻‍🦰", v:0, w:990},{t:"👨🏼‍🦱", v:0, w:99},{t:"👳🏽‍♂️", v:0, w:150,s:3}, {t:"🧔🏿‍♀️", v:0, w:11}, {t:"🧔🏽", v:0, w:11}]
 function animals(){
   for(an of animalArr){
     if(an.v&& an.alive){
@@ -822,6 +871,24 @@ function animals(){
       if(touch(an.x,an.y,arrow.x+arrow.w,arrow.y, 25)){
         playerData.hunt+=an.w
         an.alive=false
+      }
+    }
+  }
+}
+
+function badGuys(){
+  for(bg of badGArr){
+    if(bg.v&& bg.alive){
+      c.textBaseline='middle'
+      tx(bg.t, bg.x, bg.y, 5.3, colors[3])
+      c.textBaseline='alphabetic'
+      bg.y+=bg.s
+      if(bg.y<10||bg.y>c.h*.9){
+        bg.s*=-1
+      }
+      if(touch(bg.x,bg.y,arrow.x+arrow.w,arrow.y, 25)){
+        bg.alive=false
+        nBadGuy--
       }
     }
   }
@@ -902,7 +969,39 @@ const rope = {
 }
 
 function defend(){
-  //TODO : second mini game defend against bandits
+  let arrows = playerData.supplies.Arrows.n
+  tx("Your camp is under attack!", c.w / 2, c.h * .34, 5.3, colors[3])
+  tx("Arrows: "+arrows, c.w / 2, c.h *.45, 3, colors[3])
+  
+  if(arrows>0){
+    bow()
+  }else{
+    robbed()
+    timerStatus="off"
+    buttons[1].onClick()
+  }
+  if(nBadGuy<1){
+    newEvent("You defended your camp from marauders!")
+    timerStatus="off"
+    buttons[1].onClick()
+  }
+
+  badGuys()
+}
+
+function setEnemies(){
+  state="defend"
+  buttons[8].label="Continue"
+  buttons[8].color= colors [1]
+
+  nBadGuy = badGArr.length
+  for(bg of badGArr){
+    bg.v = 1+(Math.random() * 2)
+    bg.alive = true
+    bg.x = c.w*.2+Math.random()*c.w*.7
+    bg.y = c.h*.1+Math.random()*c.h*.6
+    bg.s= 1+Math.random() * 3
+  }
 }
 
 // might need to modify if price goes up and down along the wayToDo 
@@ -937,7 +1036,7 @@ function score(){
     let value = playerData.supplies[item].n/playerData.supplies[item].q*playerData.supplies[item].cost << 0
     sum+=value
   }
-  playerData.score = (sum + playerData.money )*(5-playerData.dead)
+  playerData.score = (sum + playerData.money )*(5-playerData.dead)*(brownie?brownNum:1)
 }
 
 function map(){
@@ -1021,9 +1120,14 @@ musicPlay(1)
 }
 
 function winScreen(){
-  tx("You Win!", c.w/2, c.h/2, 3, colors[3])
-  tx("Score: "+playerData.score, c.w/2, c.h*.6, 3, colors[2])
-  //TODO: what happens at end
+  let sx = 12<7 ? 12*80 : (12-7)*80
+  let sy = 12<7 ? 0 : 75
+  c.drawImage(cities,sx,sy, 80, 75, c.w/2-80*5/2,c.h*.15, 80*5, 75*5)
+  let dateDiff = Math.round(Math.abs((firstDay - playerData.date) / oneDay));
+  
+  tx("Congratulations you win!", c.w/2, c.h*.1, 4, colors[3])
+  tx("Traveled "+totalMiles+" miles in "+dateDiff, c.w/2, c.h*.6, 3, colors[2])
+  tx("Score: "+playerData.score, c.w/2, c.h*.66, 3, colors[2])
 }
 
 /** UTILS */
