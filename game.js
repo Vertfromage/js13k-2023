@@ -9,6 +9,12 @@ c.h = innerHeight
 // update k[keyCode] if any other key is pressed/released
 onkeydown = onkeyup = e => k[e.which] = self['lld*rlurdu'[e.which % 32 % 17]] = e.type[5]
 
+document.getElementById("playerInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && s==2) {
+    addMember()
+  }
+})
+
 var gameOver=false
 var mobile = window.screen.width < 500 // For vertical view
 const textContainer = document.getElementById("textContainer")
@@ -23,7 +29,7 @@ const colors = ["GoldenRod","DarkGoldenRod", "DarkSlateGrey", '#E35A31']
 
 const cities = new Image()
 const eventQueue = []
-var full = false
+// var full = false
 var play = true
 
 cities.src = "cities.png"
@@ -280,14 +286,14 @@ function setButtons(){
       new Button(c.w*.9, c.h*.6, bW/3, bH*.8, "⇩", [9], ()=>{
         lEnd<log.length && lEnd++ && lStart<log.length-5 && lStart++ 
       }),
-      new Button(c.w*.93, c.h*.05, bW/4, bH*.8, "⛶", [0,2,4], ()=>{
-        full ? document.exitFullscreen() : document.documentElement.requestFullscreen() 
-        full = !full
-        resize()
-      }),
-      new Button(c.w*.93, c.h*.15, bW/4, bH*.8, "🔈", [2,4], ()=>{
-        buttons[17].label= buttons[17].label==="🔈" ? "🔇":"🔈"
-        buttons[17].label==="🔈" ? musicPlay(currSong) : musicStop()
+      // new Button(c.w*.93, c.h*.05, bW/4, bH*.8, "⛶", [0,2,4], ()=>{
+      //   full ? document.exitFullscreen() : document.documentElement.requestFullscreen() 
+      //   full = !full
+      //   resize()
+      // }),
+      new Button(c.w*.93, c.h*.05, bW/4, bH*.8, "🔈", [2,4], ()=>{
+        buttons[16].label= buttons[16].label==="🔈" ? "🔇":"🔈"
+        buttons[16].label==="🔈" ? musicPlay(currSong) : musicStop()
       }),
 
       )
@@ -414,9 +420,9 @@ function title() {
 function setup(){
   let num = 5-Object.keys(playerData.members).length
   tx("Add "+num+" Members to Caravan!", c.w / 2, c.h * .34, 5.3, colors[3])
-  if(k[13]){
-    addMember()
-  }
+  // if(k[13]){
+  //   addMember()
+  // }
 }
 const changeWeather = () =>{
   let ran = Math.random() * 100

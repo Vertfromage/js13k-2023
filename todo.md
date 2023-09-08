@@ -8,7 +8,6 @@
 
 <!-- Mobile -->
 [] Enter keycode doesn't work on mobile go button
-[] needs full screen on mobile
 
 <!-- Picky -->
 [] Going too fast too long should cause problems
@@ -91,6 +90,7 @@
 [x] Mobile Friendly
 [x] Music
 [x] If I need more room some buttons are the same might save space by having more than one scene they're shown on in button initiation
+[] full screen on mobile... would have to improve resize function
 
 
 
