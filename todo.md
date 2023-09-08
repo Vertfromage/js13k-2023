@@ -1,18 +1,20 @@
 # Do Important* first to have a complete game
 
+<!-- Before Submit -->
+[] remove and reset all testing bits
+
 <!-- Next -->
 [] Balance random events
 [] Win Screen
-[] Too many deaths... only deaths if health !=good
-[] remove and reset all testing bits
 
 <!-- Mobile -->
-[] Enter keycode doesn't work on mobile go button
+[] Resize is buggy when I implement full screen
 
 <!-- Picky -->
-[] Going too fast too long should cause problems
-[] Prices should go down sometimes??
+[] Going too fast too long should cause problems... 
+[] Prices should go down sometimes?? could hardcode price changes??
 
+[x] Too many deaths... only deaths if health !=good
 [x] double tap on mobile needs to be disabled.
 [x] Add some fun events...
 [x] Too many storms... it's annoying
@@ -67,6 +69,8 @@
 [x] status page => health of members + quantity of each item ... could be store
 [x] ability to change pace/rations
 [x] full screen and music control buttons
+[x] Enter keycode doesn't work on mobile go button
+[] Map not centered right on mobile
 
 <!-- Nice to have but not necessary -->
 [] Choose profession
@@ -82,13 +86,13 @@
 [] Raiders mini game
 [] Decentralized (nft?)
 [] Traveling caravan animation
-[] hover over buttons to see what city
 [] on lose screen make background a dark gravestone
 
 <!-- Hard -->
 [x] Hunting mini game
 [x] Mobile Friendly
 [x] Music
+[x] hover over to see what city
 [x] If I need more room some buttons are the same might save space by having more than one scene they're shown on in button initiation
 [] full screen on mobile... would have to improve resize function
 

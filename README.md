@@ -6,7 +6,7 @@ Embark on a journey along the Silk Road, making strategic decisions and overcomi
 # Acknowledgements 
 Inspired by "The Oregon Trail" game
 
-[curtastic](https://github.com/curtastic) : [p1.js, the tiny piano](https://github.com/curtastic/p1)
+[curtastic](https://github.com/curtastic) : [p1.js, the tiny piano](https://github.com/curtastic/p1) and songs 
 
 [Tiago Correia
 ](https://twitter.com/dosaki) : helped me with how to make my map https://twitter.com/dosaki/status/1692383367809880544?s=20
