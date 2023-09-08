@@ -22,6 +22,9 @@ var timerStatus="off"
 const colors = ["GoldenRod","DarkGoldenRod", "DarkSlateGrey", '#E35A31']
 
 const cities = new Image()
+const eventQueue = []
+var full = false
+var play = true
 
 cities.src = "cities.png"
 var arrowsUsed=0
@@ -31,14 +34,14 @@ const playerData = {
   money: 2000,
   hunt:0,
   supplies : {
-    Camels: {n:0, q:1,  cost:100},
-    CamelFeed: {n:0, q:50, cost:10},
-    Food: {n:0, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
-    Clothing: {n:0,q:1, cost:10},
-    WaterSkins: {n:0, e:0, q:20, cost:5},
-    TradeGoods: {n:0,q:10, cost:100}, 
-    Arrows: {n:0, q:20, cost:10},
-    Tents: {n:0,q:1, cost:20}
+    Camels: {n:3, q:1,  cost:100},
+    CamelFeed: {n:500, q:50, cost:10},
+    Food: {n:500, q:50, cost:25}, // need about 1,188 lb steady pace filling diet
+    Clothing: {n:3,q:1, cost:10},
+    WaterSkins: {n:140, e:0, q:20, cost:5},
+    TradeGoods: {n:100,q:10, cost:100}, 
+    Arrows: {n:40, q:20, cost:10},
+    Tents: {n:3,q:1, cost:20}
   },
   settings : {
     pace: "fast",
@@ -70,23 +73,24 @@ lastPathSVG.split(" ").map((cor)=>{
 var curStep = 0
 const totalMiles = 12494
 const steps = [
-  { name: 'Vanice', country:'Italy', desc: "Venice thrived as a trading hub and cultural center.", start: dots[0], end: dots[1], percentage: 0, miles: 0},
-  { name: 'Acre', country:'Israel', desc: "Bustling port city, a focal point of trade and cultural exchange.", start: dots[1], end: dots[2], percentage: 0, miles:1900 },
-  { name: 'Trebizond', country:'Turkey', desc: "Vibrant Black Sea city that played a pivotal role in regional trade and commerce.", start: dots[2], end: dots[3], percentage: 0 , miles: 950 },
-  { name: 'Baghdag', country:'Iraq', desc: "Historic city at the heart of Islamic civilization, known for its culture, scholarship, and economic significance.", start: dots[3], end: dots[4], percentage: 0 , miles:830},
-  { name: 'Terbil', country:'Iran', desc: "Strategic crossroads city known for its multicultural atmosphere and commercial importance.", start: dots[4], end: dots[5], percentage:0 , miles:550},
-  { name: 'Ormuz', country:'Iran', desc: "Bustling island city strategically positioned along important maritime trade routes", start: dots[5], end: dots[6], percentage: 0, miles:812},
-  { name: 'Balkh', country:'Afghanistan', desc: "Ancient city that was a vital center of trade and culture along the Silk Road", start: dots[6], end: dots[7], percentage: 0 , miles:1400},
-  { name: 'Kashgar', country:'China', desc: "Thriving oasis city that served as a key junction on the Silk Road trading network.", start: dots[7], end: dots[8], percentage: 0, miles: 700 },
-  { name: 'Lanzhou', country:'China', desc: "Strategic and culturally diverse city located along the Yellow River, contributing to the Silk Road's intricate tapestry.", start: dots[8], end: dots[9], percentage:0, miles:1954},
+  { name: 'Vanice', country:'Italy', desc: "Venice thrived as a trading hub and cultural center.", start: dots[0], end: dots[1], percentage: 0, miles: 1900},
+  { name: 'Acre', country:'Israel', desc: "Bustling port city, a focal point of trade and cultural exchange.", start: dots[1], end: dots[2], percentage: 0, miles:950 },
+  { name: 'Trebizond', country:'Turkey', desc: "Vibrant Black Sea city that played a pivotal role in regional trade and commerce.", start: dots[2], end: dots[3], percentage: 0, miles: 830 },
+  { name: 'Baghdag', country:'Iraq', desc: "Historic city at the heart of Islamic civilization, known for its culture, scholarship, and economic significance.", start: dots[3], end: dots[4], percentage: 0, miles:550},
+  { name: 'Terbil', country:'Iran', desc: "Strategic crossroads city known for its multicultural atmosphere and commercial importance.", start: dots[4], end: dots[5], percentage:0 , miles:812},
+  { name: 'Ormuz', country:'Iran', desc: "Bustling island city strategically positioned along important maritime trade routes", start: dots[5], end: dots[6], percentage: 0, miles:1400},
+  { name: 'Balkh', country:'Afghanistan', desc: "Ancient city that was a vital center of trade and culture along the Silk Road", start: dots[6], end: dots[7], percentage: 0 , miles:700},
+  { name: 'Kashgar', country:'China', desc: "Thriving oasis city that served as a key junction on the Silk Road trading network.", start: dots[7], end: dots[8], percentage: 0, miles: 1954 },
+  { name: 'Lanzhou', country:'China', desc: "Strategic and culturally diverse city located along the Yellow River, contributing to the Silk Road's intricate tapestry.", start: dots[8], end: dots[9], percentage:0, miles:1000},
   { name: 'Karakorem', country:'Mongolia', desc: "The capital of the Mongol Empire, a diverse and cosmopolitan city where he met Kublai Khan.", start: dots[9], end: dots[10], percentage: 0 , miles:1000},
-  { name: 'Beijing', country:'China', desc: "Heart of the Yuan Dynasty, a vibrant capital city where Marco Polo would later serve in Kublai Khan's court.", start: dots[10], end: dots[11], percentage: 0, miles: 1970},
-  { name: "Chengdu", country:'China', desc: "Bustling city in southwestern China known for its irrigation systems, cultural vibrancy, and regional significance.", start: dots[11], end: dots[12], percentage:0, miles:1228 },
-  { name: "Pagan", country:'China', desc: "Vast landscape of temples and pagodas, showcasing the rich cultural heritage of Myanmar.", start: dots[12], end: dots[13], percentage:0, miles:1200},
+  { name: 'Lanzhou', country:'China', desc: "Strategic and culturally diverse city located along the Yellow River, contributing to the Silk Road's intricate tapestry.", start: dots[10], end: dots[11], percentage:0, miles:970},
+  { name: 'Beijing', country:'China', desc: "Heart of the Yuan Dynasty, a vibrant capital city where Marco Polo would later serve in Kublai Khan's court.", start: dots[11], end: dots[12], percentage: 0, miles: 1228},
+  { name: "Chengdu", country:'China', desc: "Bustling city in southwestern China known for its irrigation systems, cultural vibrancy, and regional significance.", start: dots[12], end: dots[13], percentage:0, miles:1200 },
+  { name: "Pagan", country:'China', desc: "Vast landscape of temples and pagodas, showcasing the rich cultural heritage of Myanmar.", start: dots[12], end: dots[13], percentage:0, miles:0},
   // This is the route to AsiaToDo the wiki map has the route back tooToDo
 ];
 // death ideas: Falling from a mountain pass, drowning in a river crossing, allergic reaction to silk, wrongfully accused and executed, rightfully accused and put to death, mistaken identity, etc.
-const death = ['a fall from a mountain pass', 'drowning in river crossing', 'allergic reaction to silk','typhoid', 'exhaustion', 'opium den thugs', 'murder by fellow traveler', 'snake bite', 'wrongful accusation and execution', 'rightful accusation and hanging']
+const death = ['a fall from a mountain pass', 'drowning in river crossing', 'allergic reaction to silk', 'opium den thugs', 'murder by fellow traveler', 'snake bite', 'framed for murder', 'executed for crime']
 const commonIllnesses = [
   'Dysentery',  'Malaria',  'Typhoid',  'Cholera',  'Pneumonia',  'Tuberculosis',
   'Influenza',  'Measles',  'Smallpox',  'Yellow Fever',  'Plague',  'Food Poisoning',
@@ -94,24 +98,42 @@ const commonIllnesses = [
   'Respiratory Infection',  'Parasitic Infection',  'Venomous Snake Bite',  'Dengue Fever',
   'Hepatitis',  'Rabies'
 ]
-const eventArr = ["death", "water", "sick", "rob", "attack"]
+const eventArr = ["death", "water", "sick", "rob", "attack", "camel"]
 const distBasedEvents = [{d:20, t:"You board a ship for the first leg of your journey from Venice to Acre."},]
 var dEvent = 0
 const pageText =['',"Follow Marco Polo's route along the silk road!","Input your caravan member's names!", '',"Control your journey by making wise decisions!", "You can only carry 200lbs! Use as few arrows as possible!"]
 var latestEvent = ""
 var log=[]//"test0","test1", "test2","test3","test4","test5","test6","test7","test8", "test9"] // Too keep track of all events
+var currSong=0
 
+const musicStop = ()=>{
+  p1``
+}
+const musicPlay = (c) =>{
+  currSong=c
+  if(c==0){
+    p1`240.40
+c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
+J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|
+`
+  }
+  if(c==1){
+    p1`240.40
+R-RTV-TRW-VTV-V-T-VWV-TR
+M-MQR-Q R-RQR-R-Q-R-R-Q `
+  }
+}
 
 // Button class
 class Button {
-  constructor(x, y, width, height, label, scene, onClick, color) {
+  constructor(x, y, width, height, label, scenes, onClick, color) {
     this.x = x
     this.y = y
     this.width = width
     this.height = height
     this.label = label
     this.isClicked = false
-    this.s = scene
+    this.s = scenes
     this.onClick = onClick
     this.color = color || colors[0]
     this.active = true
@@ -153,42 +175,40 @@ function setButtons(){
 
   buttons.push(
     // first screen button
-    new Button(c.w*.4, c.h*.5, bW, bH, "Start!", 0, ()=>{
+    new Button(c.w*.4, c.h*.5, bW, bH, "Start!", [0], ()=>{
       // very first scene should be s2: choose members 
       s=2, inputView(true), changeText(pageText[s])
-        
-      //s=6,changeText(steps[curStep].desc), state="city", toggleTextContainer(true)
+      //document.documentElement.requestFullscreen() //full screen by default
       // music
-        p1`240.40
-c-aY|X-XY|a-c-|V-V-|c-aY|X-VX|YXVT|V-  |a-c-|e--c|fece|a-V-|a-c-|e--c|feca|c-c-|e-f-|h-e |fhfc|e-e-|e-e-|e--c|fece|a-a-|
-J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|O---|
-`
+        musicPlay(0)
 
       }),
-      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 1, ()=>{
+      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", [1,8,9,10], ()=>{
         s=4
         toggleTextContainer(true)
         changeText(pageText[s])
       }),
 
-      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 5, ()=>{
+      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", [5], ()=>{
         let amount = playerData.hunt<200 ? playerData.hunt : 200
         playerData.supplies.Food.n+= amount
         newEvent("You used "+arrowsUsed+" arrows to hunt "+amount+" lbs of food.")
+        arrowsUsed=0
         if(playerData.supplies.Food.n>50){
           timerStatus="off"
+          buttons[8].active = true
         }
         s=4
         changeText(pageText[s])
         dayPasses() 
       }),
-      new Button(c.w*.5-bW*.6, c.h*.6, bW*1.2, bH, "Add Member!", 2, ()=>{
+      new Button(c.w*.5-bW*.6, c.h*.6, bW*1.2, bH, "Add Member!", [2], ()=>{
         addMember()
       }),
-      new Button(c.w*.5-bW*1.5-2, mapH, bW, bH, "Status!", 4, ()=>{
+      new Button(c.w*.5-bW*1.5-2, mapH, bW, bH, "Status!", [4], ()=>{
         s=8, changeText("Check on your supplies and party members!")
       }),
-      new Button(bCen, mapH, bW, bH, "Hunt!", 4, ()=>{
+      new Button(bCen, mapH, bW, bH, "Hunt!", [4], ()=>{
         buttons[8].label="Continue"
         buttons[8].color= colors [1]
         if(state!=='city'){
@@ -207,13 +227,13 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
           alert("Too many people around!")
         }
       }),
-      new Button(c.w*.5+2+bW*.5, mapH, bW, bH, "Big Map!", 4, ()=>{
+      new Button(c.w*.5+2+bW*.5, mapH, bW, bH, "Big Map!", [4], ()=>{
         s=1, changeText(pageText[s])
       }),
-      new Button(c.w*.5-bW*1.5-2, mapH+bH+5, bW, bH, "Logs!", 4, ()=>{
+      new Button(c.w*.5-bW*1.5-2, mapH+bH+5, bW, bH, "Logs!", [4], ()=>{
         s=9, toggleTextContainer(false)
       }),      
-      new Button(bCen, mapH+bH+5, bW, bH, "Continue", 4, ()=>{
+      new Button(bCen, mapH+bH+5, bW, bH, "Continue", [4], ()=>{
         if(state==="win"){
           s=10
           return
@@ -226,7 +246,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
         buttons[8].label=(buttons[8].label ==="Rest")? "Continue":"Rest"
         buttons[8].color= state==="moving" ? colors[0] : colors [1]
       }, colors[1]),
-      new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Shop!", 4, ()=>{
+      new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Shop!", [4], ()=>{
         if(state==='city'){
           s=3
           toggleTextContainer(false)
@@ -234,48 +254,48 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
           alert("Can only visit shop in city!")
         }
       }),
-      new Button(bCen, c.h*.7, bW, bH, "Overview!", 6, ()=>{
+      new Button(bCen, c.h*.7, bW, bH, "Overview!", [6], ()=>{
         s=4, changeText("Control your journey by making wise decisions!")
         toggleTextContainer(true), newEvent("You arrived in "+steps[curStep].name+", "+steps[curStep].country)
         if(steps[curStep].name==="Pagan"){
           //last city
           state="win"
+          win()
           buttons[8].label="See Score"
         }
       }),
-      new Button(c.w*.4, c.h*.55, bW*.7, bH*.7, playerData.settings["pace"], 8, ()=>{
+      new Button(c.w*.4, c.h*.55, bW*.7, bH*.7, playerData.settings["pace"], [8], ()=>{
         flipSetting(11,["slow","steady","fast"], "pace")
       
       }),
-      new Button(c.w*.55, c.h*.55, bW*.7, bH*.7, playerData.settings["rations"], 8, ()=>{
+      new Button(c.w*.55, c.h*.55, bW*.7, bH*.7, playerData.settings["rations"], [8], ()=>{
         flipSetting(12,["poor","good","filling"], "rations")
       }),
-      new Button(c.w*.7, c.h*.55, bW*.7, bH*.7, playerData.settings["load"], 8, ()=>{
+      new Button(c.w*.7, c.h*.55, bW*.7, bH*.7, playerData.settings["load"], [8], ()=>{
         flipSetting(13,["light","medium","heavy"], "load")
       }),
-      new Button(c.w*.4, c.h*.8, bW, bH, "Back!", 9, ()=>{
-        s=4
-        toggleTextContainer(true)
-        changeText(pageText[s])
-      }),
-      new Button(c.w*.9, c.h*.3, bW/3, bH*.8, "⬆", 9, ()=>{
+      new Button(c.w*.9, c.h*.3, bW/3, bH*.8, "⇧", [9], ()=>{
         lStart>0 && lStart-- && lEnd>5 && lEnd--
       }),
-      new Button(c.w*.9, c.h*.6, bW/3, bH*.8, "⬇", 9, ()=>{
+      new Button(c.w*.9, c.h*.6, bW/3, bH*.8, "⇩", [9], ()=>{
         lEnd<log.length && lEnd++ && lStart<log.length-5 && lStart++ 
       }),
-      new Button(c.w*.4, c.h*.7, bW, bH, "Back!", 8, ()=>{
-        s=4
-        toggleTextContainer(true)
-        changeText(pageText[s])
+      new Button(c.w*.93, c.h*.05, bW/4, bH*.8, "⛶", [0,2,4], ()=>{
+        full ? document.exitFullscreen() : document.documentElement.requestFullscreen() 
+        full = !full
       }),
+      new Button(c.w*.93, c.h*.15, bW/4, bH*.8, "🔈", [2,4], ()=>{
+        buttons[17].label= buttons[17].label==="🔈" ? "🔇":"🔈"
+        buttons[17].label==="🔈" ? musicPlay(currSong) : musicStop()
+      }),
+
       )
   buttons[5].active=false // hunting in city not ok
   
   var H=c.h*.22
   for(item in playerData.supplies){
     buttons.push(
-      new Button(c.w * 0.7, H, 60, 30, "+", 3, (() => {
+      new Button(c.w * 0.7, H, 60, 30, "+", [3], (() => {
         const currentItem = item;
         return () => {
           if(playerData.money - playerData.supplies[currentItem].cost >=0){
@@ -284,7 +304,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
           }
         };
       })()),
-      new Button(c.w * 0.78, H, 60, 30, "-", 3, (() => {
+      new Button(c.w * 0.78, H, 60, 30, "-", [3], (() => {
         const currentItem = item;
         return () => {
           if(playerData.supplies[currentItem].n>=playerData.supplies[currentItem].q){
@@ -297,7 +317,7 @@ J---|J---|J---|J---|J---|J---|J---|J---|O---|O---|O---|O---|O---|O---|O---|O---|
     H+=c.h*.06
   }
   H+=c.h*.05
-  buttons.push(new Button(c.w*.7, H, bW, bH, "Done!", 3, ()=>{
+  buttons.push(new Button(c.w*.7, H, bW, bH, "Done!", [3], ()=>{
     if(firstShop) {s=6, firstShop=false, changeText(steps[curStep].desc)}
     else {s=4}
     state="city", toggleTextContainer(true) 
@@ -399,7 +419,7 @@ function setup(){
 }
 const changeWeather = () =>{
   let ran = Math.random() * 100
-  playerData.weather= ran<60 ? "Sunny" : ran<75 ? "Cloudy" : ran<95 ? "Raining" : "Storm"
+  playerData.weather= ran<60 ? "Sunny" : ran<75 ? "Cloudy" : ran<98 ? "Raining" : "Storm"
 }
 
 function mainPage(){
@@ -420,7 +440,7 @@ function mainText(){
   let curFood= playerData.supplies["Food"].n,
   camelFeed= playerData.supplies["CamelFeed"].n,
   curWater = playerData.supplies["WaterSkins"].n,
-  distCity = steps[curStep+1].miles-playerData.currLeg,
+  distCity = steps[curStep].miles-playerData.currLeg,
   totalTraveled = playerData.totalTraveled,
   health= healthStatus(),
   date=playerData.date.toDateString(),
@@ -457,15 +477,15 @@ function statusPage(){
   tx("Caravan Members", right, H+mob, 3.5, colors[3], "left")
   H+=c.h*.1
   tx("Name", right, H+mob, 2.5, colors[3], "left")
-  tx("Health", right+c.w*.2, H+mob, 2.5, colors[3], "left")
-  tx("Illness", right+c.w*.35, H+mob, 2.5, colors[3], "left")
+  tx("Health", right+c.w*.1, H+mob, 2.5, colors[3], "left")
+  tx("Illness", right+c.w*.2, H+mob, 2.5, colors[3], "left")
   for(mem in playerData.members){
     H+=c.h*.05
     let h = playerData.members[mem].health
     h = h> 2 ? "good" : h >1 ? "fair" : h>0 ? "poor" : "dead"
     tx(mem, right, H+mob, 2.5, colors[2], "left")
-    tx(h, right+c.w*.2, H+mob, 2.5, colors[2], "left")
-    tx(playerData.members[mem].ill, right+c.w*.35, H+mob, 2.5, colors[2],"left")
+    tx(h, right+c.w*.1, H+mob, 2.5, colors[2], "left")
+    tx(playerData.members[mem].ill, right+c.w*.2, H+mob, 2.5, colors[2],"left")
   }
   H=c.h*.55
   tx("Pace", right-5, H+mob-5, 3, colors[3], "left")
@@ -517,7 +537,7 @@ function moving(){
       }
       playerData.currLeg += currPace
       playerData.totalTraveled += currPace
-      steps[curStep].percentage = playerData.currLeg/steps[curStep+1].miles
+      steps[curStep].percentage = playerData.currLeg/steps[curStep].miles
 
       if(dEvent<distBasedEvents.length && playerData.totalTraveled >= distBasedEvents[dEvent].d){
         newEvent(distBasedEvents[dEvent].t )
@@ -532,7 +552,9 @@ function moving(){
       state="runningOut"
       clearInterval(travelTimer)
       changeText("You have too little food you must stop to hunt!")
+      newEvent("You're running out of food, you must stop to hunt!")
       buttons[8].label="continue"
+      buttons[8].active=false
       return
     }
     if(
@@ -582,7 +604,7 @@ function moving(){
     if(steps[curStep].percentage>=1){
       steps[curStep].percentage=1
       playerData.currLeg=0
-      curStep+=1
+      curStep++
       timerStatus="off"
       state="city"
       refillWater()
@@ -592,6 +614,7 @@ function moving(){
       s=6, changeText(steps[curStep].desc)
       buttons[8].label="Continue"
     }else{
+      emptyEventQ()
       // Important! need to turn timer to 'on' or it will stay 'elapsed' and run constantly
       timerStatus="on"
     }
@@ -601,13 +624,26 @@ function moving(){
   }
 }
 
+function delay(milliseconds){
+  return new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+  })
+}
+
+async function emptyEventQ(){
+  while(eventQueue.length>0){
+    latestEvent = eventQueue.shift()
+    await delay(500)
+  }
+}
+
 // hunting takes 1 day
 function dayPasses(){
   changeWeather()
   playerData.date = addDays(playerData.date, 1)
   // supplies consumed
   playerData.supplies["Food"].n-= eating[playerData.settings.rations]*(5-playerData.dead) 
-  playerData.supplies["CamelFeed"].n-= eating[playerData.settings.rations]*3*playerData.supplies["Camels"].n
+  playerData.supplies["CamelFeed"].n-= eating[playerData.settings.rations]*playerData.supplies["Camels"].n
   if(playerData.supplies["WaterSkins"].n>0 && playerData.weather!=="Raining"){
     playerData.supplies["WaterSkins"].n-= (5-playerData.dead)
     playerData.supplies["WaterSkins"].e+= (5-playerData.dead)
@@ -623,6 +659,7 @@ function dayPasses(){
   }
 
   if(Math.random() >.9){
+    console.log("random event")
     randomEvent()
   }
 }
@@ -635,27 +672,31 @@ function addDays(date, days) {
 
 function updatePrices(){
   for(item in playerData.supplies){
-    let pChange = Math.random()*2
+    let pChange = 1+Math.random()*2<<0
     playerData.supplies[item].cost = playerData.supplies[item].cost*pChange<<0
   }
   playerData.supplies["TradeGoods"].cost+=50
 }
 
 function newEvent(e){
-  setTimeout(()=>{
-    latestEvent = e
+    if(state==="moving"|| state==="rest"){
+      eventQueue.push(e)
+    }else{
+      latestEvent=e
+    }
+    
     log.push(playerData.date.toDateString()+" : "+e)
-  },1000)
-  //console.log(log)
 }
 
 function randomEvent(){
   let rand = Math.random() * eventArr.length << 0
+  console.log(eventArr[rand])
   switch (rand) {
-    case 0: playerData.dead<4 && memDied()
+    case 0: playerData.dead<2 && memDied()
       break
     case 1: newEvent("Stopped at an oasis to refill water!")
             refillWater()
+            heal()
       break
     case 2: memSick()
       break
@@ -663,11 +704,14 @@ function randomEvent(){
       break
     case 4: //TODO: attack minigame
       break
+    case 5: newEvent("You find a lose camel")
+            playerData.supplies["Camels"].n++
+      break
 }
 }
 
 function memDied(){
-  if(Math.random()*(playerData.rations==="good"? 10 : 5) < 1){
+  if(Math.random()*(Math.random()*(playerData.rations==="filling"? 12 : playerData.rations==="filling"? 8 : 5) < 5)){
     let who = randProp(playerData.members)
     if(who.health>0){
     who.health = 0
@@ -708,6 +752,13 @@ const heal = () =>{
         newEvent(who.k+" is no longer sick from "+who.ill)
         who.ill='none'
       }
+  }
+  if(playerData.supplies["WaterSkins"].n>0){
+    for(m in playerData.members){
+      if(playerData.members[m].ill==="thirst"){
+        playerData.members[m].ill="none"
+      }
+    }
   }
 }
 
@@ -903,8 +954,13 @@ function drawMap(size, tX, tY){
       c.strokeStyle = colors[2] // line for route
       c.stroke(path)
 
-      c.strokeStyle = colors[1] // line for progress
+      // line for progress
       steps.forEach(step=>{
+        if(step.country==="Mongolia"){
+          c.strokeStyle = colors[0]
+        }else{
+          c.strokeStyle = colors[1] 
+        }
         drawPercentOfLine(step.start.x, step.start.y, step.end.x, step.end.y, step.percentage)
       })
 
@@ -943,15 +999,14 @@ function lose(){
 
 function win(){
  s=10
+ score()
 // change the music
-p1`240.40
-R-RTV-TRW-VTV-V-T-VWV-TR
-M-MQR-Q R-RQR-R-Q-R-R-Q `
+musicPlay(1)
 }
 
 function winScreen(){
-  tx("You Win!", c.w/2, c.h/2, 3, colors)
-  tx("Score: "+playerData.score )
+  tx("You Win!", c.w/2, c.h/2, 3, colors[3])
+  tx("Score: "+playerData.score, c.w/2, c.h*.6, 3, colors[2])
   //TODO: what happens at end
 }
 
@@ -984,7 +1039,7 @@ function handleButtonClick(x, y, s) {
         x <= button.x + button.width &&
         y >= button.y &&
         y <= button.y + button.height &&
-        button.s==s
+        (button.s).includes(s)
       ) {
         button.isClicked = !button.isClicked;
         button.onClick()
@@ -994,7 +1049,7 @@ function handleButtonClick(x, y, s) {
   }
 
 function drawButtons() {
-    buttons.forEach(button => button.s==s && button.draw())
+    buttons.forEach(button => (button.s).includes(s) && button.draw())
 }
 
 function toggleTextContainer(show) {
@@ -1038,8 +1093,8 @@ function logs(start, end){
     H+=c.h*.1
   }
   // button active
-  buttons[15].active = start!==0
-  buttons[16].active = end!==log.length 
+  buttons[14].active = start!==0
+  buttons[15].active = end!==log.length 
   
 } 
 
