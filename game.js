@@ -68,7 +68,6 @@ const playerData = {
   score: 0
 }
 const mouse = {x:0, y:0}
-const touchCorr = {x:0, y:0}
 playerData.date = new Date('1271-05-01')
 
 const camelPace = {slow:18, steady: 40, fast:70}
@@ -434,14 +433,9 @@ function smoothAnimation(e) {
 // in each screen, you can make a click update the game state
 // ex: "game over if we click on the bottom half of the screen" => `if(y>h/2)s=3;`
 onclick = e => {
-    x = e.clientX - a.getBoundingClientRect().left
-    y = e.clientY - a.getBoundingClientRect().top
+    setMouse(e)
 
-    touchCorr.x = x
-    touchCorr.y = y
-    adjustMouseCoordinates(touchCorr)
-
-    if(handleButtonClick(x,y,s)){
+    if(handleButtonClick(mouse.x,mouse.y,s)){
       return
     }
 
@@ -459,6 +453,10 @@ onclick = e => {
           break
     }
     
+}
+
+onmousemove = e => { 
+  setMouse(e)
 }
 
 var shootySound = "duh"
@@ -1091,7 +1089,7 @@ function drawMap(size, tX, tY){
         }
         drawPercentOfLine(step.start.x, step.start.y, step.end.x, step.end.y, step.percentage)
         
-        if(touch(touchCorr.x/size-tX,touchCorr.y/size-tY, step.start.x , step.start.y, 6)){
+        if(touch(mouse.x/size-tX,mouse.y/size-tY, step.start.x , step.start.y, 6)){
           tx(step.name+", "+step.country,step.start.x, step.start.y-40, 2.5, colors[2])
         }
       })
@@ -1100,7 +1098,7 @@ function drawMap(size, tX, tY){
         c.beginPath();
         c.arc(x, y, 3, 0, Math.PI * 2)
         c.fillStyle = "#E35A31"
-        if(touch(touchCorr.x/size-tX,touchCorr.y/size-tY, x , y, 6)){
+        if(touch(mouse.x/size-tX,mouse.y/size-tY, x , y, 6)){
           c.fillStyle=colors[2]
         }
         c.fill()
@@ -1239,12 +1237,16 @@ const touch =(x1,y1,x2,y2, d) =>{
 
 var orient=0
 
-// // might need for archery game
-onmousemove = e => { 
-    mouse.x = e.clientX - a.getBoundingClientRect().left
-    mouse.y = e.clientY - a.getBoundingClientRect().top
 
-    adjustMouseCoordinates(mouse)
+
+
+  function setMouse(e){
+    const canvasRect = a.getBoundingClientRect()
+    const scaleX = a.width / canvasRect.width
+    const scaleY = a.height / canvasRect.height
+
+    mouse.x = (e.clientX - a.getBoundingClientRect().left)*scaleX
+    mouse.y = (e.clientY - a.getBoundingClientRect().top)*scaleY
   }
     
   function resizeCanvas() {
@@ -1265,7 +1267,7 @@ onmousemove = e => {
       c.h = screenWidth / targetAspectRatio
       orient=0
     }
-    
+
     a.style.position = 'absolute'
     a.style.left = `${(screenWidth - c.w) / 2}px`
     a.style.top = `${(screenHeight - c.h) / 2}px`
@@ -1292,11 +1294,10 @@ onmousemove = e => {
   resizeCanvas()
   window.addEventListener('resize', resizeCanvas)
 
-  function adjustMouseCoordinates(m) {
-    //todo
+
+  function adjustMouseCoordinates() {
+
   }
-
-
 
   
   
