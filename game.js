@@ -1089,7 +1089,7 @@ function drawMap(size, tX, tY){
         c.beginPath();
         c.arc(x, y, 3, 0, Math.PI * 2)
         c.fillStyle = "#E35A31"
-        if(touch(mouse.x/size-tX,mouse.y/size-tY, x , y, 6)){
+        if(touch(mouse.x/size-tX-offL,mouse.y/size-tY-offR, x , y, 6)){
           c.fillStyle=colors[2]
         }
         c.fill()
@@ -1231,8 +1231,8 @@ var offR = 0
 
 // // might need for archery game
 onmousemove = e => { 
-    mouse.x = e.clientX-offL,
-    mouse.y = e.clientY-offR;
+    mouse.x = e.clientX,
+    mouse.y = e.clientY;
   }
     
   function resizeCanvas() {
