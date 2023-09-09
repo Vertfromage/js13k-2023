@@ -4,7 +4,7 @@
 Embark on a journey along the Silk Road, making strategic decisions and overcoming challenges to successfully reach your destination in the East!
 
 # Decentralized Feature
-If you login 
+For my decentralized part I'm giving an advantage to anyone who has mr.brown nfts, if you login and have Mr.Brown nfts the first member of your caravan is Mr.Brown and he can't die or get sick based on random events only on bad decisions like running out of water or clothes. Also your end score is multiplied by how many mr.brown nfts you have.
 
 # Acknowledgements 
 Inspired by "The Oregon Trail" game

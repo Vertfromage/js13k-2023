@@ -13,7 +13,7 @@
 [] Going too fast too long should cause problems... 
 [] Prices should go down sometimes?? could hardcode price changes??
 [] Add more story line distance based events
-
+[x] Shoots an arrow when you click back button...
 [x] When you arrive at a city anyone with thirst should heal
 [x] When under attack shouldn't keep moving
 [x] win screen should say how many miles and days you traveled

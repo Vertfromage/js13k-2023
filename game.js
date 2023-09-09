@@ -431,20 +431,34 @@ function smoothAnimation(e) {
 // ex: "game over if we click on the bottom half of the screen" => `if(y>h/2)s=3;`
 onclick = e => {
     x = e.pageX; y = e.pageY
+
+    if(handleButtonClick(x,y,s)){
+      return
+    }
+
     switch (s) {
-        case 0: 
-          break;
         case 5:
         case 11:
           if(arrow.set&&playerData.supplies.Arrows.n>0){
-            arrow.x= rope.x,arrow.y=arc.y-3
-            arrow.set = false
-            playerData.supplies.Arrows.n--
-            arrowsUsed++
+            sound(shootySound).then(()=>{
+              arrow.x= rope.x,arrow.y=arc.y-3
+              arrow.set = false
+              playerData.supplies.Arrows.n--
+              arrowsUsed++
+            })
           }
-          break;
+          break
     }
-    handleButtonClick(x,y,s)
+    
+}
+
+var shootySound = "duh"
+// Thanks Curtis!
+async function sound(s){
+  let msg = new SpeechSynthesisUtterance()
+  msg.text = s
+  msg.pitch=5
+  window.speechSynthesis.speak(msg)
 }
 
 function title() {
@@ -1165,8 +1179,10 @@ function handleButtonClick(x, y, s) {
         button.isClicked = !button.isClicked;
         button.onClick()
         drawButtons()
+        return true
       }
     });
+    return false
   }
 
 function drawButtons() {
