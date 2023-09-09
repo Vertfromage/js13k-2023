@@ -28,6 +28,7 @@ const dots = []
 var travelTimer
 var timerStatus="off"
 const colors = ["GoldenRod","DarkGoldenRod", "DarkSlateGrey", '#E35A31']
+var thin = false
 
 const cities = new Image()
 const eventQueue = []
@@ -490,7 +491,7 @@ function mainPage(){
   drawRoundedRect(c,5, c.h/3-5, c.w-10, txtW-10)
   tx(latestEvent, c.w / 2, c.h*.45, 2.5, 'GoldenRod')
   c.fillStyle = "lightblue"
-  let scale2 = {s:1,w: c.w*.45, h: -c.h*.1}
+  let scale2 = fullScreen && thin ? {s:1, w: c.w*.45, h: -c.h*.2}  : {s:1, w: c.w*.45, h: -c.h*.1} 
   drawRoundedRect(c,c.w/3, 5, c.w/3, c.h/3+10) 
   drawMap(scale2.s, scale2.w, scale2.h)
   mainText()
@@ -1059,13 +1060,15 @@ function score(){
 }
 
 function map(){
-  let scale1 = {s:2,w: c.w*.2, h: -c.h*.08}
+  let scale1 = fullScreen && thin ? {s:2, w: c.w*.2, h: -c.h*.16}  : {s:2,w: c.w*.2, h: -c.h*.08}
   c.fillStyle = "lightblue"
   c.fillRect(0, 0, c.w, c.h)
   drawMap(scale1.s, scale1.w, scale1.h)
   tx("Map", c.w / 2, c.h * .1, 5.3, colors[3])
 }
 function drawMap(size, tX, tY){
+  if(fullScreen){
+  }
   // draw map
   svg.forEach((svgPath, i) => {
     const path = new Path2D(svgPath)
@@ -1255,6 +1258,8 @@ var orient=0
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     const screenAspectRatio = screenWidth / screenHeight;
+
+    thin = screenHeight < 400 
   
     if (screenAspectRatio > targetAspectRatio) {
       // Screen is wider, adjust canvas height
@@ -1267,10 +1272,12 @@ var orient=0
       c.h = screenWidth / targetAspectRatio
       orient=0
     }
+  
 
     a.style.position = 'absolute'
     a.style.left = `${(screenWidth - c.w) / 2}px`
     a.style.top = `${(screenHeight - c.h) / 2}px`
+
 
     // reposition text container
     textContainer.style.width = `${screenWidth}px`;
@@ -1288,16 +1295,13 @@ var orient=0
 
     if(fullScreen){
       buttons[18].label="X"
+      buttons[17].label= loggedIn ? "logout" : "login"
     }
   }
 
   resizeCanvas()
   window.addEventListener('resize', resizeCanvas)
 
-
-  function adjustMouseCoordinates() {
-
-  }
 
   
   
