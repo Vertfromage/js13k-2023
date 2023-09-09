@@ -320,7 +320,7 @@ function setButtons(){
           login()
         }        
       }),
-      new Button(c.w*.93, c.h*.15, bW/4, bH*.8, "⛶", [0], ()=>{
+      new Button(c.w*.93, c.h*.15, bW/4, bH*.8, "⛶", [0,4], ()=>{
         buttons[18].label= buttons[18].label==="⛶" ? "X":"⛶"
         buttons[18].label==="X" ? (fullScreen=true , document.documentElement.requestFullscreen()) :( document.exitFullscreen(), fullScreen=false)
       }),
@@ -1226,10 +1226,13 @@ const touch =(x1,y1,x2,y2, d) =>{
   return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2) < d
 }
 
+var offL = 0
+var offR = 0
+
 // // might need for archery game
 onmousemove = e => { 
-    mouse.x = e.clientX,
-    mouse.y = e.clientY;
+    mouse.x = e.clientX-offL,
+    mouse.y = e.clientY-offR;
   }
     
   function resizeCanvas() {
@@ -1249,8 +1252,8 @@ onmousemove = e => {
       c.h = screenWidth / targetAspectRatio
     }
 
-    let offL = (screenWidth - c.w) / 2
-    let offR = (screenHeight - c.h) / 2
+    offL = (screenWidth - c.w) / 2
+    offR = (screenHeight - c.h) / 2
     
     a.style.position = 'absolute'
     a.style.left = `${offL}px`
