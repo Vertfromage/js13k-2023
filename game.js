@@ -68,6 +68,7 @@ const playerData = {
   score: 0
 }
 const mouse = {x:0, y:0}
+const touchCorr = {x:0, y:0}
 playerData.date = new Date('1271-05-01')
 
 const camelPace = {slow:18, steady: 40, fast:70}
@@ -418,6 +419,13 @@ function smoothAnimation(e) {
     }
     if(state==="moving"||state==="rest"){moving()}
     drawButtons()
+
+    c.beginPath();
+    c.arc(mouse.x, mouse.y, 3, 0, Math.PI * 2)
+    c.fillStyle = "green"
+    c.fill()
+    c.closePath()
+
     reqAnimationId = requestAnimationFrame(smoothAnimation)
 }
 
@@ -429,6 +437,9 @@ onclick = e => {
     x = e.clientX - a.getBoundingClientRect().left
     y = e.clientY - a.getBoundingClientRect().top
 
+    touchCorr.x = x
+    touchCorr.y = y
+    adjustMouseCoordinates(touchCorr)
 
     if(handleButtonClick(x,y,s)){
       return
@@ -1080,7 +1091,7 @@ function drawMap(size, tX, tY){
         }
         drawPercentOfLine(step.start.x, step.start.y, step.end.x, step.end.y, step.percentage)
         
-        if(touch(mouse.x/size-tX,mouse.y/size-tY, step.start.x , step.start.y, 6)){
+        if(touch(touchCorr.x/size-tX,touchCorr.y/size-tY, step.start.x , step.start.y, 6)){
           tx(step.name+", "+step.country,step.start.x, step.start.y-40, 2.5, colors[2])
         }
       })
@@ -1089,7 +1100,7 @@ function drawMap(size, tX, tY){
         c.beginPath();
         c.arc(x, y, 3, 0, Math.PI * 2)
         c.fillStyle = "#E35A31"
-        if(touch(mouse.x/size-tX-offL,mouse.y/size-tY-offR, x , y, 6)){
+        if(touch(touchCorr.x/size-tX,touchCorr.y/size-tY, x , y, 6)){
           c.fillStyle=colors[2]
         }
         c.fill()
@@ -1226,13 +1237,14 @@ const touch =(x1,y1,x2,y2, d) =>{
   return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2) < d
 }
 
-var offL = 0
-var offR = 0
+var orient=0
 
 // // might need for archery game
 onmousemove = e => { 
-    mouse.x = e.clientX,
-    mouse.y = e.clientY;
+    mouse.x = e.clientX - a.getBoundingClientRect().left
+    mouse.y = e.clientY - a.getBoundingClientRect().top
+
+    adjustMouseCoordinates(mouse)
   }
     
   function resizeCanvas() {
@@ -1246,18 +1258,17 @@ onmousemove = e => {
       // Screen is wider, adjust canvas height
       c.h = screenHeight
       c.w = screenHeight * targetAspectRatio
+      orient=1
     } else {
       // Screen is more square or taller, adjust canvas width
       c.w = screenWidth
       c.h = screenWidth / targetAspectRatio
+      orient=0
     }
-
-    offL = (screenWidth - c.w) / 2
-    offR = (screenHeight - c.h) / 2
     
     a.style.position = 'absolute'
-    a.style.left = `${offL}px`
-    a.style.top = `${offR}px`
+    a.style.left = `${(screenWidth - c.w) / 2}px`
+    a.style.top = `${(screenHeight - c.h) / 2}px`
 
     // reposition text container
     textContainer.style.width = `${screenWidth}px`;
@@ -1280,6 +1291,10 @@ onmousemove = e => {
 
   resizeCanvas()
   window.addEventListener('resize', resizeCanvas)
+
+  function adjustMouseCoordinates(m) {
+    //todo
+  }
 
 
 
