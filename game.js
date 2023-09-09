@@ -419,12 +419,13 @@ function smoothAnimation(e) {
     }
     if(state==="moving"||state==="rest"){moving()}
     drawButtons()
-
-    c.beginPath();
-    c.arc(mouse.x, mouse.y, 3, 0, Math.PI * 2)
-    c.fillStyle = "green"
-    c.fill()
-    c.closePath()
+    
+    // Testing input
+    // c.beginPath();
+    // c.arc(mouse.x, mouse.y, 3, 0, Math.PI * 2)
+    // c.fillStyle = "green"
+    // c.fill()
+    // c.closePath()
 
     reqAnimationId = requestAnimationFrame(smoothAnimation)
 }
@@ -524,6 +525,8 @@ function statusPage(){
   let left = c.w*.2,
   right = c.w*.4
   H = c.h*.1
+
+  toggleTextContainer(!(fullScreen && thin))
 
   tx("Supplies", left, H, 3.5, colors[3])
   H+=c.h*.05
@@ -1259,7 +1262,7 @@ var orient=0
     const screenHeight = window.innerHeight;
     const screenAspectRatio = screenWidth / screenHeight;
 
-    thin = screenHeight < 400 
+    thin = screenHeight < 400
   
     if (screenAspectRatio > targetAspectRatio) {
       // Screen is wider, adjust canvas height
@@ -1280,7 +1283,7 @@ var orient=0
 
 
     // reposition text container
-    textContainer.style.width = `${screenWidth}px`;
+    textContainer.style.width = `${screenWidth}px`
 
     // Update arrow and arc positions and sizes based on canvas size
     arrow.x = c.w/2+c.w*.1
