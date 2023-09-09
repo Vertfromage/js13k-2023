@@ -36,7 +36,7 @@ var play = true
 var  nBadGuy=0
 var firstDay=new Date('1271-05-01')
 const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-
+var fullScreen=false
 
 
 cities.src = "cities.png"
@@ -320,9 +320,12 @@ function setButtons(){
           login()
         }        
       }),
+      new Button(c.w*.93, c.h*.15, bW/4, bH*.8, "⛶", [0], ()=>{
+        buttons[18].label= buttons[18].label==="⛶" ? "X":"⛶"
+        buttons[18].label==="X" ? (fullScreen=true , document.documentElement.requestFullscreen()) :( document.exitFullscreen(), fullScreen=false)
+      }),
 
       )
-  
   
   var H=c.h*.22
   for(item in playerData.supplies){
@@ -1266,9 +1269,16 @@ onmousemove = e => {
     // reposition other elements
     buttons.length=0
     setButtons()
+
+    if(fullScreen){
+      buttons[18].label="X"
+    }
   }
 
   resizeCanvas()
   window.addEventListener('resize', resizeCanvas)
+
+
+
   
   
