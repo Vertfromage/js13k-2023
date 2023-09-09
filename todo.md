@@ -4,7 +4,9 @@
 [] remove and reset all testing bits
 
 <!-- Next -->
+[x] !!IMPORTANT!! fix resize function to resize to any screen!!
 [] Balance random events
+[] Make sure kill box is big enough
 
 <!-- Mobile -->
 [] Resize is buggy when I implement full screen

@@ -3,8 +3,9 @@
 // initialize keys states (u,r,d,l for directions, k for all the keyboard)
 c = a.getContext`2d`, k = [u = r = d = l = s = 0]
 // (initialize your global variables here)
-c.w = innerWidth
-c.h = innerHeight
+// c.w = innerWidth
+// c.h = innerHeight
+
 // update u,l,d,r globals when an arrow key/wasd/zqsd is pressed or released
 // update k[keyCode] if any other key is pressed/released
 onkeydown = onkeyup = e => k[e.which] = self['lld*rlurdu'[e.which % 32 % 17]] = e.type[5]
@@ -19,14 +20,11 @@ document.getElementById("playerInput").addEventListener("keydown", (e) => {
 initializeNear()
 
 var gameOver=false
-var vertical = window.screen.width < 500 // For vertical view
-var thin = window.screen.height < 415
 const textContainer = document.getElementById("textContainer")
 const txtInput = document.getElementById("playerInput")
 const svg =["m -10.389267,104.73924 5.8771626,7.44441 L 64.446638,84.756881 196.87876,98.470267 v 17.631493 l -21.1578,4.30993 -10.97071,18.80692 -1.95905,-13.71338 12.53796,-10.18709 -31.73669,5.87717 -7.83622,9.40346 7.83622,3.5263 -11.75434,19.19874 -3.13448,-0.39181 -5.48536,5.48535 2.74268,7.0526 -5.87716,2.35087 -1.17544,-9.40347 -5.48535,-1.95905 -3.91811,3.5263 5.48535,2.74268 -3.5263,2.35086 3.91811,8.22803 -10.97071,14.49701 -9.403461,-2.35086 -3.526301,6.66078 5.877166,5.09355 -6.268976,9.01165 -6.268977,-7.0526 -2.350865,4.70173 3.918109,5.87717 -5.485353,-4.30992 -0.391813,-10.97071 -10.187085,-8.61984 -14.497008,9.40346 -3.13449,11.36252 -14.888818,-25.0759 -27.426771,-7.44441 4.70173,9.40346 7.052601,-3.13449 4.70173,6.26898 -8.619841,7.83622 -17.23968657,-3.5263 -9.01165263,-13.32158 -1.9590544,-0.39181 2.7426761,9.79528 -15.2806295,-1.56724 -0.783621,4.30992 -18.023308,-7.0526 -11.754332,9.01165 -18.80693,-14.49701 4.701734,-11.75433 23.50866,-2.74267 0.783624,5.87716 13.321575,4.30992 0.391811,-4.70173 19.3807227,3.61729 3.3918505,-9.11555 -13.7609202,0.40472 -1.959054,-7.83622 -4.701733,9.40346 -3.91811,-10.18708 -8.619843,-6.26898 -1.371338,1.17543 9.207559,8.22803 -0.587716,0.58772 -2.546772,-1.56724 0.783622,2.54677 -3.330394,3.7222 -3.722205,-1.95905 4.701733,-0.97953 0.783622,-1.56724 -9.795276,-8.42394 -2.938583,2.15496 -4.505827,-0.58772 -5.289449,5.68126 -0.195905,3.5263 -8.032126,3.3304 -5.877166,-3.91811 2.154961,-9.20756 9.795276,0.78362 v -4.89764 l -4.897638,-4.30992 9.59937,-2.54677 4.309921,-6.66079 5.093544,-0.58772 -0.783622,-5.68126 3.330394,-2.15496 0.783622,3.3304 3.134488,-1.17544 -3.134488,-5.68126 -5.093544,3.13449 -2.742677,-1.95905 -0.391811,-6.8567 15.868347,-14.10519 -3.722205,-0.39182 18.415119,-7.2485 21.1577954,8.61984 -0.19590551,1.95906 -3.72220479,2.35086 z","m -21.947693,108.06964 h -5.877166 l -0.587716,2.74267 -5.485355,5.28945 0.587716,2.74268 2.546771,1.76315 -3.526298,2.93858 -0.195906,4.70174 -4.897638,1.17543 -1.567244,1.76315 -3.330395,-1.17544 0.783625,1.95906 3.526298,-0.39181 2.154959,1.17543 5.681261,-1.76315 1.567246,1.17543 1.959054,-2.35086 0.979527,-5.28945 3.330393,1.95906 0.97953,-2.35087 -1.763152,-2.35087 3.722206,-0.97952 3.330392,0.78362 3.13449,-1.56725 2.938581,-0.39181 -0.783621,-2.35086 -1.959055,-0.78363 -0.783621,2.93859 -9.403467,0.39181 -3.330392,-1.56725 v -4.89763 z","m -14.111473,146.07531 -4.309923,6.46488 1.371341,3.5263 3.330393,-0.19591 3.5263,-2.35086 8.2280309,2.35086 2.7426761,-1.76315 -6.464882,-5.48535 -5.289447,1.76315 z","m 14.490731,145.09578 -6.2689768,4.70173 3.9181118,6.46488 -1.175433,4.89764 7.248504,1.56725 -0.391811,-4.70174 -4.309922,-8.03212 3.722205,-3.91811 z","m -61.912418,120.9994 -5.093544,3.72221 1.175433,4.70173 3.722206,3.7222 -2.938585,0.78363 v 6.26897 l 8.423939,-2.54677 1.959055,-3.5263 -3.330395,-0.1959 -3.918109,-6.26898 1.567243,-3.13449 -3.408391,0.58982 z","m -70.541346,130.24098 3.532415,-0.27705 1.10821,1.52379 -1.10821,1.10821 -0.346315,3.11683 -4.779151,1.38527 -0.277053,-1.52379 1.385263,-1.8701 -1.523788,-0.27706 0.138525,-1.93936 2.701261,0.0693 z","m 145.21307,134.25824 -2.35492,12.1903 -2.77053,8.58862 0.13853,5.81809 -11.0821,4.70989 -3.60168,3.1861 1.52379,3.60168 1.93937,-3.7402 12.19029,-3.74021 2.21642,-7.06483 -2.21642,-4.29431 3.74021,0.83116 3.7402,-2.90905 -5.12546,-3.46315 2.632,-1.52379 -1.66232,-3.32463 2.77053,-0.83116 z","m 98.534197,188.3909 -2.546771,0.78362 0.391811,1.95905 2.15496,0.19591 0.979527,-1.95905 z","m 113.91278,180.65263 -2.05701,2.79166 1.17544,2.39984 1.8611,-4.60378 z","m 55.434985,203.47562 -0.783622,3.03654 1.371338,2.74268 2.350866,-2.05701 z","m -42.713677,149.2098 33.891653,21.15779 5.2894494,-14.69291 8.0321255,12.92976 6.4648821,-10.38299 -0.587716,15.08472 27.32882,-5.3874 21.745513,-8.03212 25.957481,2.25291 -2.546772,-14.00724 2.546772,13.90929 22.333229,-2.64473 -18.708977,13.81134 -12.635906,16.16221"]
 var state = 'city'
 const dots = []
-var txScale = vertical ? 1.4 : 1
 var travelTimer
 var timerStatus="off"
 const colors = ["GoldenRod","DarkGoldenRod", "DarkSlateGrey", '#E35A31']
@@ -170,7 +168,7 @@ class Button {
     drawRoundedRect(c, this.x, this.y, this.width, this.height)
 
     c.fillStyle = colors[2]
-    c.font = 3*txScale+"vw Consolas"
+    c.font = 3+"vw Consolas"
     c.textAlign = "center"
     c.textBaseline = "middle"
     c.fillText(this.label, this.x + this.width / 2, this.y + this.height / 2)
@@ -187,10 +185,12 @@ var lStart = 0
 var lEnd = 5
 var firstShop = true
 
+
+
 function setButtons(){
-  var bW = vertical ? 250 : 200
-  var bH = vertical ? 70 : 60
-  var mapH = (vertical ? c.h*.28+5 : c.h/3+5)+90
+  var bW = 200
+  var bH = 60
+  var mapH = c.h/3+95
   var bCen = c.w*.5-bW*.5
 
   buttons.push(
@@ -307,11 +307,6 @@ function setButtons(){
       new Button(c.w*.9, c.h*.6, bW/3, bH*.8, "⇩", [9], ()=>{
         lEnd<log.length && lEnd++ && lStart<log.length-5 && lStart++ 
       }),
-      // new Button(c.w*.93, c.h*.05, bW/4, bH*.8, "⛶", [0,2,4], ()=>{
-      //   full ? document.exitFullscreen() : document.documentElement.requestFullscreen() 
-      //   full = !full
-      //   resize()
-      // }),
       new Button(c.w*.93, c.h*.05, bW/4, bH*.8, "🔈", [2,4], ()=>{
         buttons[16].label= buttons[16].label==="🔈" ? "🔇":"🔈"
         buttons[16].label==="🔈" ? musicPlay(currSong) : musicStop()
@@ -360,7 +355,6 @@ function setButtons(){
     state="city", toggleTextContainer(true) 
   }))
 }
-setButtons()
 changeText("Embark on a journey along the Silk Road, making strategic decisions and overcoming challenges to successfully reach your destination in the East!")
 
 function addMember(){
@@ -392,8 +386,7 @@ const flipSetting = (n, arr, set) => {
 let reqAnimationId
 function smoothAnimation(e) {
 	a.width = innerWidth, a.height = innerHeight
-  if(vertical){tx("!!Better in wide view!!", c.w / 2, c.h * .75, 6, colors[2])}
-    switch (s) {
+      switch (s) {
         case 0: title()
           break
         case 1: map()
@@ -430,7 +423,9 @@ function smoothAnimation(e) {
 // in each screen, you can make a click update the game state
 // ex: "game over if we click on the bottom half of the screen" => `if(y>h/2)s=3;`
 onclick = e => {
-    x = e.pageX; y = e.pageY
+    x = e.clientX - a.getBoundingClientRect().left
+    y = e.clientY - a.getBoundingClientRect().top
+
 
     if(handleButtonClick(x,y,s)){
       return
@@ -478,13 +473,13 @@ const changeWeather = () =>{
 function mainPage(){
   let txtW=100
   c.fillStyle = colors[0]
-  c.fillRect(0, (vertical? c.h*.28 : c.h/3)-10, c.w, txtW)
+  c.fillRect(0, c.h/3-10, c.w, txtW)
   c.fillStyle = colors[2]
-  drawRoundedRect(c,5, (vertical? c.h*.28 : c.h/3)-5, c.w-10, txtW-10)
-  tx(latestEvent, c.w / 2, (vertical? c.h*.31 : c.h*.45), 2.5, 'GoldenRod')
+  drawRoundedRect(c,5, c.h/3-5, c.w-10, txtW-10)
+  tx(latestEvent, c.w / 2, c.h*.45, 2.5, 'GoldenRod')
   c.fillStyle = "lightblue"
-  let scale2 = vertical ? {s:3,w: c.w*.1, h: -c.h*.03} : thin ? {s:1,w: c.w*.45, h: -c.h*.17} : {s:1,w: c.w*.45, h: -c.h*.1}
-  vertical ? c.fillRect(0, 0, c.w, c.h*.28) : drawRoundedRect(c,c.w/3, 5, c.w/3, c.h/3+10) 
+  let scale2 = {s:1,w: c.w*.45, h: -c.h*.1}
+  drawRoundedRect(c,c.w/3, 5, c.w/3, c.h/3+10) 
   drawMap(scale2.s, scale2.w, scale2.h)
   mainText()
 }
@@ -498,52 +493,50 @@ function mainText(){
   health= healthStatus(),
   date=playerData.date.toDateString(),
   weather=playerData.weather,
-  mob = vertical?c.h/3:0, 
   left = c.w*.15,
   right = c.w*.8
 
-  tx("Date: "+date, left, c.h*.1+mob, 2, colors[2])
-  tx("Next City: "+distCity+" miles", left, c.h*.15+mob, 2, colors[2])
-  tx("Traveled: "+totalTraveled+" miles", left, c.h*.2+mob, 2, colors[2])
-  tx("Weather: "+weather, left, c.h*.25+mob, 2, colors[2])
-  tx("Health: "+health, right, c.h*.1+mob, 2, colors[2])
-  tx("Food: "+curFood+" lbs", right, c.h*.15+mob, 2, colors[2])
-  tx("Camel Feed: "+camelFeed+" lbs", right, c.h*.2+mob, 2, colors[2])
-  tx("Water: "+curWater+" skins", right, c.h*.25+mob, 2, colors[2])
+  tx("Date: "+date, left, c.h*.1, 2, colors[2])
+  tx("Next City: "+distCity+" miles", left, c.h*.15, 2, colors[2])
+  tx("Traveled: "+totalTraveled+" miles", left, c.h*.2, 2, colors[2])
+  tx("Weather: "+weather, left, c.h*.25, 2, colors[2])
+  tx("Health: "+health, right, c.h*.1, 2, colors[2])
+  tx("Food: "+curFood+" lbs", right, c.h*.15, 2, colors[2])
+  tx("Camel Feed: "+camelFeed+" lbs", right, c.h*.2, 2, colors[2])
+  tx("Water: "+curWater+" skins", right, c.h*.25, 2, colors[2])
   
 }
 
 function statusPage(){
   let left = c.w*.2,
   right = c.w*.4
-  mob = vertical?c.h/3:0, 
   H = c.h*.1
 
-  tx("Supplies", left, H+mob, 3.5, colors[3])
+  tx("Supplies", left, H, 3.5, colors[3])
   H+=c.h*.05
   for(item in playerData.supplies){
     H+=c.h*.05
-    tx(item+": "+playerData.supplies[item].n, left, H+mob, 2, colors[2])
+    tx(item+": "+playerData.supplies[item].n, left, H, 2, colors[2])
   }
 
   H = c.h*.1  
-  tx("Caravan Members", right, H+mob, 3.5, colors[3], "left")
+  tx("Caravan Members", right, H, 3.5, colors[3], "left")
   H+=c.h*.1
-  tx("Name", right, H+mob, 2.5, colors[3], "left")
-  tx("Health", right+c.w*.15, H+mob, 2.5, colors[3], "left")
-  tx("Illness", right+c.w*.25, H+mob, 2.5, colors[3], "left")
+  tx("Name", right, H, 2.5, colors[3], "left")
+  tx("Health", right+c.w*.15, H, 2.5, colors[3], "left")
+  tx("Illness", right+c.w*.25, H, 2.5, colors[3], "left")
   for(mem in playerData.members){
     H+=c.h*.05
     let h = playerData.members[mem].health
     h = h> 2 ? "good" : h >1 ? "fair" : h>0 ? "poor" : "dead"
-    tx(mem, right, H+mob, 2.5, colors[2], "left")
-    tx(h, right+c.w*.15, H+mob, 2.5, colors[2], "left")
-    tx(playerData.members[mem].ill, right+c.w*.25, H+mob, 2.5, colors[2],"left")
+    tx(mem, right, H, 2.5, colors[2], "left")
+    tx(h, right+c.w*.15, H, 2.5, colors[2], "left")
+    tx(playerData.members[mem].ill, right+c.w*.25, H, 2.5, colors[2],"left")
   }
   H=c.h*.55
-  tx("Pace", right-5, H+mob-5, 3, colors[3], "left")
-  tx("Rations", right+c.w*.15-5, H+mob-5, 3, colors[3], "left")
-  tx("Load", right+c.w*.3-5, H+mob-5, 3, colors[3], "left")
+  tx("Pace", right-5, H-5, 3, colors[3], "left")
+  tx("Rations", right+c.w*.15-5, H-5, 3, colors[3], "left")
+  tx("Load", right+c.w*.3-5, H-5, 3, colors[3], "left")
   
   if(loggedIn){
     tx(userName, c.w*.02, c.h*.7, 2, colors[3], "left")
@@ -963,14 +956,14 @@ function bow(){
 }
 
 const arrow ={
-  x:c.w/2,
-  y:c.h/2,
+  x:0,
+  y:0,
   w: 100,
   set:true
 }
 const arc = {
-  x:30,
-  y:100,
+  x:0,
+  y:0,
   dy:3,
     r:50,
     start:Math.PI+Math.PI/2,
@@ -1054,7 +1047,7 @@ function score(){
 }
 
 function map(){
-  let scale1 = vertical ? {s:3,w: c.w*.1, h: 0} : thin? {s:2,w: c.w*.2, h: -c.h*.16} : {s:2,w: c.w*.2, h: -c.h*.08}
+  let scale1 = {s:2,w: c.w*.2, h: -c.h*.08}
   c.fillStyle = "lightblue"
   c.fillRect(0, 0, c.w, c.h)
   drawMap(scale1.s, scale1.w, scale1.h)
@@ -1145,16 +1138,6 @@ function winScreen(){
 }
 
 /** UTILS */
-function resize(){
-  vertical = window.screen.width < 500
-  thin = window.screen.height < 415
-  c.w = innerWidth
-  c.h = innerHeight
-  buttons.length=0
-  txScale = vertical ? 1.5 : 1
-  setButtons()
-}
-window.addEventListener('resize', resize);
 
 function start() {
     reqAnimationId = requestAnimationFrame(smoothAnimation)
@@ -1163,7 +1146,8 @@ function start() {
 function tx(t, w, h, f, s, a) {
     c.textAlign = a || 'center'
     c.fillStyle = s
-    c.font = txScale*f + 'vw Consolas'
+    const fSize = Math.min(c.w, c.h) *.12* (f / 100)
+    c.font = fSize + 'em Consolas'
     c.fillText(t, w, h)
 }
 
@@ -1244,4 +1228,47 @@ onmousemove = e => {
     mouse.x = e.clientX,
     mouse.y = e.clientY;
   }
+    
+  function resizeCanvas() {
+    console.log("Resize")
+    const targetAspectRatio = 16 / 9;
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const screenAspectRatio = screenWidth / screenHeight;
+  
+    if (screenAspectRatio > targetAspectRatio) {
+      // Screen is wider, adjust canvas height
+      c.h = screenHeight
+      c.w = screenHeight * targetAspectRatio
+    } else {
+      // Screen is more square or taller, adjust canvas width
+      c.w = screenWidth
+      c.h = screenWidth / targetAspectRatio
+    }
 
+    let offL = (screenWidth - c.w) / 2
+    let offR = (screenHeight - c.h) / 2
+    
+    a.style.position = 'absolute'
+    a.style.left = `${offL}px`
+    a.style.top = `${offR}px`
+
+    // reposition text container
+    textContainer.style.width = `${screenWidth}px`;
+
+    // Update arrow and arc positions and sizes based on canvas size
+    arrow.x = c.w/2+c.w*.1
+    arrow.y = c.h/2
+    arc.x = 30 
+    arc.y = c.h/2 
+    rope.x = arc.x-25
+
+    // reposition other elements
+    buttons.length=0
+    setButtons()
+  }
+
+  resizeCanvas()
+  window.addEventListener('resize', resizeCanvas)
+  
+  
