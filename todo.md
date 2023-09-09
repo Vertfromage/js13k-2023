@@ -7,6 +7,7 @@
 [x] !!IMPORTANT!! fix resize function to resize to any screen!!
 [] Balance random events
 [] Make sure kill box is big enough
+[] sometimes the wrong button gets set to inactive
 
 <!-- Mobile -->
 [] Resize is buggy when I implement full screen

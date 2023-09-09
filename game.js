@@ -322,7 +322,7 @@ function setButtons(){
       }),
 
       )
-  buttons[5].active=false // hunting in city not ok
+  
   
   var H=c.h*.22
   for(item in playerData.supplies){
