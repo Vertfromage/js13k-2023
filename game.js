@@ -38,7 +38,7 @@ var  nBadGuy=0
 var firstDay=new Date('1271-05-01')
 const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
 var fullScreen=false
-
+var overloaded = false
 
 cities.src = "cities.png"
 var arrowsUsed=0
@@ -270,7 +270,7 @@ function setButtons(){
           s=5
           changeText(pageText[s])
         }else{
-          alert("Too many people around!")
+          alert("Can't hunt in city!")
         }
       }),
       new Button(c.w*.5+2+bW*.5, mapH, bW, bH, "Big Map!", [4], ()=>{
@@ -564,6 +564,8 @@ function statusPage(){
     tx(userName, c.w*.02, c.h*.7, 2, colors[3], "left")
     tx(brownNum+" Mr.Brown NFTs", c.w*.02, c.h*.8, 2, colors[3], "left")
   }
+
+  tx(loadCalc()+" lbs per camel", c.w*.5, H+c.w*.05, 3, (overloaded ? "red" : colors[2]))
 }
 
 const healthStatus = () =>{
@@ -606,6 +608,9 @@ function moving(){
       if(playerData.weather==="Storm"){
         newEvent("Storm slows us down to half pace!")
         currPace/=2
+      }
+      if(overloaded){
+        currPace*.7
       }
       playerData.currLeg += currPace
       playerData.totalTraveled += currPace
@@ -711,6 +716,7 @@ async function emptyEventQ(){
 
 // hunting takes 1 day
 function dayPasses(){
+  loadCalc()
   changeWeather()
   playerData.date = addDays(playerData.date, 1)
   // supplies consumed
@@ -1062,26 +1068,41 @@ function setEnemies(){
 // might need to modify if price goes up and down along the wayToDo 
 function shop(){
   tx("Shop", c.w / 2, c.h * .1, 5.3, colors[3])
-  let H=c.h*.19
+  let H=c.h*.19, weight=0
+  let supplies = playerData.supplies
   sum = 0
   tx("Item", c.w*.2, H, 4,colors[2])
   tx("$", c.w*.35, H, 4,colors[2])
   tx("Num", c.w*.45, H, 4,colors[2])
   tx("Value", c.w*.55, H, 4, colors[2])
   H+=c.h*.06
-for(item in playerData.supplies){
+for(item in supplies){
   tx(item, c.w*.2, H, 3, colors[3])
-  tx(playerData.supplies[item].cost, c.w*.35, H, 3, colors[3])
-  tx(playerData.supplies[item].n, c.w*.45, H, 3, colors[2])
-  let value = playerData.supplies[item].n/playerData.supplies[item].q*playerData.supplies[item].cost << 0
+  tx(supplies[item].cost, c.w*.35, H, 3, colors[3])
+  tx(supplies[item].n, c.w*.45, H, 3, colors[2])
+  let value = supplies[item].n/supplies[item].q*supplies[item].cost << 0
   tx(value, c.w*.55, H, 3, colors[2])
   H+=c.h*.06
   sum+=value
 }
-H+=c.h*.05
-tx("Total "+sum+"$", c.w*.5, H, 3, colors[2])
-H+=c.h*.05
-tx("You have "+playerData.money+"$", c.w*.5, H, 3, colors[2])
+
+tx("Total "+sum+"$", c.w*.5, H+=c.h*.05, 3, colors[2])
+tx("You have "+playerData.money+"$", c.w*.5, H+=c.h*.05, 3, colors[2])
+tx(loadCalc()+" lbs per camel", c.w*.5, H+c.w*.05, 3, (overloaded ? "red" : colors[2]))
+}
+
+const loadCalc = ()=>{
+  let supplies = playerData.supplies, weight=0
+  if(supplies["Camels"].n){
+    for(item in supplies){
+      weight+=supplies[item].n
+    }
+    weight = weight/(supplies["Camels"].n)<<0
+    playerData.settings.load = weight<150 ? "light" : weight<250 ? "medium" : "heavy"
+    overloaded = weight>450
+    return weight 
+  }
+  return 0
 }
 
 function score(){
@@ -1266,17 +1287,13 @@ function logs(start, end){
   // button active
   buttons[14].active = start!==0
   buttons[15].active = end!==log.length 
-  
 } 
+
+
 
 const touch =(x1,y1,x2,y2, d) =>{
   return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2) < d
 }
-
-var orient=0
-
-
-
 
   function setMouse(e){
     const canvasRect = a.getBoundingClientRect()
@@ -1299,22 +1316,18 @@ var orient=0
       // Screen is wider, adjust canvas height
       c.h = screenHeight
       c.w = screenHeight * targetAspectRatio
-      orient=1
     } else {
       // Screen is more square or taller, adjust canvas width
       c.w = screenWidth
       c.h = screenWidth / targetAspectRatio
-      orient=0
     }
-  
-
     a.style.position = 'absolute'
     a.style.left = `${(screenWidth - c.w) / 2}px`
     a.style.top = `${(screenHeight - c.h) / 2}px`
 
-
     // reposition text container
     textContainer.style.width = `${screenWidth}px`
+    txtInput.style.marginTop = `${(txtInput.clientHeight - txtInput.clientHeight) / 2}px`
 
     // Update arrow and arc positions and sizes based on canvas size
     arrow.x = c.w/2+c.w*.1
