@@ -87,7 +87,7 @@ lastPathSVG.split(" ").map((cor)=>{
 var curStep = 0
 const totalMiles = 14795
 const steps = [
-  { name: 'Vanice', country:'Italy', desc: "Venice thrived as a trading hub and cultural center.", start: dots[0], end: dots[1], percentage: 0, miles: 1900},
+  { name: 'Venice', country:'Italy', desc: "Venice thrived as a trading hub and cultural center.", start: dots[0], end: dots[1], percentage: 0, miles: 1900},
   { name: 'Acre', country:'Israel', desc: "Bustling port city, a focal point of trade and cultural exchange.", start: dots[1], end: dots[2], percentage: 0, miles:950 },
   { name: 'Trebizond', country:'Turkey', desc: "Vibrant Black Sea city that played a pivotal role in regional trade and commerce.", start: dots[2], end: dots[3], percentage: 0, miles: 830 },
   { name: 'Baghdag', country:'Iraq', desc: "Historic city at the heart of Islamic civilization, known for its culture, scholarship, and economic significance.", start: dots[3], end: dots[4], percentage: 0, miles:550},
@@ -113,11 +113,25 @@ const commonIllnesses = [
   'Hepatitis',  'Rabies'
 ]
 const eventArr = ["death", "water", "sick", "rob", "attack", "camel", "heal"]
-const distBasedEvents = [{d:20, t:"You board a ship for the first leg of your journey from Venice to Acre."},]
+const distBasedEvents = [
+{d:20, t:"You board a ship for the first leg of your journey."},
+{d:100,t:"You savor shipboard cuisine as you sail."},
+{d:900,t:"Find tranquility, enjoying serene ocean vistas"},
+{d:600,t:"Soothing melodies aboard the ship transport you."},
+{d:900,t:"Explore a island market for unique treasures."},
+{d:1500,t:"Join a jubilant onboard celebration."},
+{d:2000,t:"Browse a busy market and pick up a unique souvenir."},
+{d:2500,t:"Gather 'round as a local shares fascinating legends."},
+{d:3500,t:"Meditate and find peace at a remote monastery."},
+{d:5000,t:"Savor a nomad's delicious meal in their yurt."},
+{d:7000,t:"Attend a mesmerizing city arts performance."},
+{d:9000,t:"Receive a personalized work of art as a gift."},
+{d:11567, t:"Met Marco Polo, says he's working on a book."},
+{d:13000 , t:"Feeling homesick you wonder if was all worth it."}]
 var dEvent = 0
 const pageText =['',"Follow Marco Polo's route along the silk road!","Input your caravan member's names!", '',"Control your journey by making wise decisions!", "You can only carry 200lbs! Use as few arrows as possible!"]
 var latestEvent = ""
-var log=[]//"test0","test1", "test2","test3","test4","test5","test6","test7","test8", "test9"] // Too keep track of all events
+var log=[]
 var currSong=0
 
 const musicStop = ()=>{
@@ -236,11 +250,16 @@ function setButtons(){
         s=8, changeText("Check on your supplies and party members!")
       }),
       new Button(bCen, mapH, bW, bH, "Hunt!", [4], ()=>{
+        if(playerData.supplies["Arrows"].n<1){
+          alert("Out of arrows!")
+          return 
+        }
         buttons[8].label="Continue"
         buttons[8].color= colors [1]
         if(state!=='city'){
           state="hunt"
-          for(an of animalArr){
+          let arr = playerData.totalTraveled<1900 ? seaArr : animalArr
+          for(an of arr){
             an.v = (Math.random() * 2)
             an.alive = true
             an.x = c.w*.2+Math.random()*c.w*.7
@@ -325,7 +344,6 @@ function setButtons(){
         buttons[18].label= buttons[18].label==="⛶" ? "X":"⛶"
         buttons[18].label==="X" ? (fullScreen=true , document.documentElement.requestFullscreen()) :( document.exitFullscreen(), fullScreen=false)
       }),
-
       )
   
   var H=c.h*.22
@@ -445,12 +463,10 @@ onclick = e => {
         case 5:
         case 11:
           if(arrow.set&&playerData.supplies.Arrows.n>0){
-            sound(shootySound).then(()=>{
               arrow.x= rope.x,arrow.y=arc.y-3
               arrow.set = false
               playerData.supplies.Arrows.n--
               arrowsUsed++
-            })
           }
           break
     }
@@ -459,15 +475,6 @@ onclick = e => {
 
 onmousemove = e => { 
   setMouse(e)
-}
-
-var shootySound = "duh"
-// Thanks Curtis!
-async function sound(s){
-  let msg = new SpeechSynthesisUtterance()
-  msg.text = s
-  msg.pitch=5
-  window.speechSynthesis.speak(msg)
 }
 
 function title() {
@@ -518,7 +525,6 @@ function mainText(){
   tx("Food: "+curFood+" lbs", right, c.h*.15, 2, colors[2])
   tx("Camel Feed: "+camelFeed+" lbs", right, c.h*.2, 2, colors[2])
   tx("Water: "+curWater+" skins", right, c.h*.25, 2, colors[2])
-  
 }
 
 function statusPage(){
@@ -629,7 +635,7 @@ function moving(){
       && (Math.random()*10<1)
     ){
       playerData.supplies["Camels"].n--
-      newEvent("You have no camel feed, one of your camels died! Food store increases.")
+      newEvent("No camel feed! One camel died! Food store increases.")
       playerData.supplies["Food"].n+=200
     }
 
@@ -725,7 +731,6 @@ function dayPasses(){
   }
 
   if(Math.random() >.9){
-    console.log("random event")
     randomEvent()
   }
 }
@@ -738,7 +743,7 @@ function addDays(date, days) {
 
 function updatePrices(){
   for(item in playerData.supplies){
-    let pChange = 1+Math.random()*2<<0
+    let pChange = 1+Math.random()
     playerData.supplies[item].cost = playerData.supplies[item].cost*pChange<<0
   }
   playerData.supplies["TradeGoods"].cost+=50
@@ -756,7 +761,7 @@ function newEvent(e){
 
 function randomEvent(){
   let rand = Math.random() * eventArr.length << 0
-  console.log(eventArr[rand])
+  //console.log(eventArr[rand])
   switch (rand) {
     case 0: playerData.dead<2 && memDied()
       break
@@ -778,8 +783,26 @@ function randomEvent(){
 }
 
 function memDied(){
+  let who
+  if(playerData.totalTraveled<1900&& playerData.dead<1){
+    let what = (Math.random()*2 << 0 )<1 ? "fell overboard" : "Ship wreck"
+    who = randProp(playerData.members)
+    if(who.brown){
+      return // Mr.Brown doesn't die randomly!
+    }
+    who.death = "drowned" 
+    who.ill = "drowned" 
+    if(what="Ship wreck"){
+      newEvent(what+"! "+who.k+" was sadly lost.")
+    }else{
+      newEvent(who.k+" "+what+" and was lost.")
+    }
+    
+    return 
+  }
+
   if(Math.random()*(Math.random()*(playerData.rations==="filling"? 12 : playerData.rations==="filling"? 8 : 5) < 5)){
-    let who = randProp(playerData.members)
+    who = randProp(playerData.members)
     if(who.brown){
       return // Mr.Brown doesn't die randomly!
     }
@@ -828,7 +851,7 @@ const heal = () =>{
   }
   if(playerData.supplies["WaterSkins"].n>0){
     for(m in playerData.members){
-      if(playerData.members[m].ill==="thirst"){
+      if(m.health>0 && playerData.members[m].ill==="thirst"){
         playerData.members[m].ill="none"
       }
     }
@@ -861,7 +884,7 @@ function refillWater(){
   playerData.supplies["WaterSkins"].e=0
 
   for(m in playerData.members){
-    if(playerData.members[m].ill==="thirst"){
+    if(m.health>0 && playerData.members[m].ill==="thirst"){
       playerData.members[m].ill="none"
     }
   }
@@ -869,20 +892,29 @@ function refillWater(){
 
 function hunt(){
   let arrows = playerData.supplies.Arrows.n
+  let sea = playerData.totalTraveled<1900
+  if(sea){
+    c.fillStyle = "lightblue"
+    drawRoundedRect(c,0, 0, c.w, c.h)
+  }
   tx("Hunting", c.w / 2, c.h * .34, 5.3, colors[3])
-  tx("Arrows: "+arrows, c.w / 2, c.h *.45, 3, colors[3])
-  tx("Killed: "+playerData.hunt+" lbs", c.w / 2, c.h *.55, 3, colors[3])
+  tx("Click/Tap to shoot!", c.w / 2, c.h *.45, 2.5, colors[2])
+  tx("Arrows: "+arrows, c.w / 2, c.h *.5, 2.5, colors[2])
+  tx("Killed: "+playerData.hunt+" lbs", c.w / 2, c.h *.55, 2.5, colors[2])
+
+  animals(sea)
   if(arrows>0){
     bow()
   }
-  animals()
-
 }
 
 var animalArr = [{t:"🐪", v:0, w:990},{t:"🐏", v:0, w:99},{t:"🦌", v:0, w:150,s:3}, {t:"🐇", v:0, w:11}]
+var seaArr =[{t:"🐟", v:0, w:11},{t:"🐢", v:0, w:99},{t:"🦈", v:0, w:250,s:3}, {t:"🦑", v:0, w:11}]
 var badGArr =[{t:"👩🏻‍🦰", v:0, w:990},{t:"👨🏼‍🦱", v:0, w:99},{t:"👳🏽‍♂️", v:0, w:150,s:3}, {t:"🧔🏿‍♀️", v:0, w:11}, {t:"🧔🏽", v:0, w:11}]
-function animals(){
-  for(an of animalArr){
+function animals(sea){
+  let arr = sea ? seaArr : animalArr
+
+  for(an of arr){
     if(an.v&& an.alive){
       c.textBaseline='middle'
       tx(an.t, an.x, an.y, 5.3, colors[3])
@@ -1256,7 +1288,6 @@ var orient=0
   }
     
   function resizeCanvas() {
-    console.log("Resize")
     const targetAspectRatio = 16 / 9;
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;

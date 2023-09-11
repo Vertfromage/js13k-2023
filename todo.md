@@ -1,21 +1,31 @@
 # Do Important* first to have a complete game
 
-<!-- Before Submit -->
-[] remove and reset all testing bits
-
-<!-- Next -->
-[x] !!IMPORTANT!! fix resize function to resize to any screen!!
-[] Balance random events
-[] Make sure kill box is big enough
-[] sometimes the wrong button gets set to inactive
-
 <!-- Mobile -->
 [] Resize is buggy when I implement full screen
+[] When mobile goes full screen resize is broken
+[] Not centered correctly on mobile
 
 <!-- Picky -->
+[] sometimes the wrong button gets set to inactive
 [] Going too fast too long should cause problems... 
-[] Prices should go down sometimes?? could hardcode price changes??
-[] Add more story line distance based events
+
+[x] sound is dumb on mobile
+[x] remove and reset all testing bits
+[x] no hunting while at sea??Change animals.
+[x] check if money is calculated correctly
+[x] Add more story line distance based events
+[x] Font in latest events is too big for ship event... and camel dead too long as well
+[x] directions tap to shoot
+[x] don't allow hunting if no arrows
+[x] Balance random events
+[x] Make sure kill box is big enough
+[x] varnice typo
+[x] spell check
+[x] mom couldn't figure out how to shoot the arrow
+[x] If no arrows no hunting
+[x] don't heal thirst if dead!
+[x] Resize broke click coordinates
+[x] !!IMPORTANT!! fix resize function to resize to any screen!!
 [x] Shoots an arrow when you click back button...
 [x] When you arrive at a city anyone with thirst should heal
 [x] When under attack shouldn't keep moving
@@ -78,17 +88,22 @@
 [x] full screen and music control buttons
 [x] Enter keycode doesn't work on mobile go button
 [x] Map not centered right on mobile
+[] hunting music 
+[] under attack music
 
 <!-- Nice to have but not necessary -->
 [] Choose profession
 [] Restart -> currently just refresh
-[] ship sinks is a tiny chance on the first leg of journey
+[x] ship sinks is a tiny chance on the first leg of journey
 [] technically you shouldn't die of anything other than ship wreck on first leg of journey
 [] pick up random member in a city... cool idea (remember we hard coded the party as 5 multiple times though...)
 [] How much camels can carry effects how much you can carry
 [] Talk
 [] Make load matter in game by making camels only carry a certain amount each
 [] Lily refreshed by accident and lost progress... would need restart and local storage to fix this.
+[] kill animation
+[] Prices should go down sometimes?? could hardcode price changes??
+[] Shoot and kill sounds
 
 <!-- Cool but not necessary -->
 [x] Raiders mini game
