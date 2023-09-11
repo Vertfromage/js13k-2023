@@ -103,8 +103,8 @@ const steps = [
   { name: "Pagan", country:'China', desc: "Vast landscape of temples and pagodas, showcasing the rich cultural heritage of Myanmar.", start: dots[13], end: dots[13], percentage:0, miles:0},
   // This is the route to AsiaToDo the wiki map has the route back tooToDo
 ];
-// death ideas: Falling from a mountain pass, drowning in a river crossing, allergic reaction to silk, wrongfully accused and executed, rightfully accused and put to death, mistaken identity, etc.
-const death = ['a fall from a mountain pass', 'drowning in river crossing', 'allergic reaction to silk', 'opium den thugs', 'murder by fellow traveler', 'snake bite', 'framed for murder', 'executed for crime']
+// death ideas: Falling from a mountain pass, allergic reaction to silk, wrongfully accused and executed, rightfully accused and put to death, mistaken identity, etc.
+const death = ['a fall from a mountain pass', 'allergic reaction to silk', 'opium den thugs', 'murder by fellow traveler', 'snake bite', 'framed for murder', 'executed for crime']
 const commonIllnesses = [
   'Dysentery',  'Malaria',  'Typhoid',  'Cholera',  'Pneumonia',  'Tuberculosis',
   'Influenza',  'Measles',  'Smallpox',  'Yellow Fever',  'Plague',  'Food Poisoning',
@@ -676,7 +676,6 @@ function moving(){
       }
     }
     
-    
     // check if we've reached a new city
     if(steps[curStep].percentage>=1){
       steps[curStep].percentage=1
@@ -756,6 +755,9 @@ function updatePrices(){
 }
 
 function newEvent(e){
+  if(e.indexOf("died") !== -1){
+    playerData.dead++
+  }
     if(state==="moving"|| state==="rest"){
       eventQueue.push(e)
     }else{
@@ -789,13 +791,14 @@ function randomEvent(){
 }
 
 function memDied(){
-  let who
+  let who = randProp(playerData.members)
+  if(who.brown){
+    return // Mr.Brown doesn't die randomly!
+  }
+
   if(playerData.totalTraveled<1900&& playerData.dead<1){
     let what = (Math.random()*2 << 0 )<1 ? "fell overboard" : "Ship wreck"
-    who = randProp(playerData.members)
-    if(who.brown){
-      return // Mr.Brown doesn't die randomly!
-    }
+    
     who.death = "drowned" 
     who.ill = "drowned" 
     if(what="Ship wreck"){
@@ -803,15 +806,11 @@ function memDied(){
     }else{
       newEvent(who.k+" "+what+" and was lost.")
     }
-    
+    playerData.dead++
     return 
   }
 
-  if(Math.random()*(Math.random()*(playerData.rations==="filling"? 12 : playerData.rations==="filling"? 8 : 5) < 5)){
-    who = randProp(playerData.members)
-    if(who.brown){
-      return // Mr.Brown doesn't die randomly!
-    }
+  if(Math.random()*(Math.random()*(playerData.rations==="filling"? 12 : playerData.rations==="filling"? 8 : 5) < 4)){
     if(who.health>0 && who.health<3){
     who.health = 0
     let diedOf 
@@ -916,7 +915,7 @@ function hunt(){
 
 var animalArr = [{t:"🐪", v:0, w:990},{t:"🐏", v:0, w:99},{t:"🦌", v:0, w:150,s:3}, {t:"🐇", v:0, w:11}]
 var seaArr =[{t:"🐟", v:0, w:11},{t:"🐢", v:0, w:99},{t:"🦈", v:0, w:250,s:3}, {t:"🦑", v:0, w:11}]
-var badGArr =[{t:"👩🏻‍🦰", v:0, w:990},{t:"👨🏼‍🦱", v:0, w:99},{t:"👳🏽‍♂️", v:0, w:150,s:3}, {t:"🧔🏿‍♀️", v:0, w:11}, {t:"🧔🏽", v:0, w:11}]
+var badGArr =[{t:"👩", v:0, w:990},{t:"👨🏼‍🦱", v:0, w:99},{t:"👳🏽‍♂️", v:0, w:150,s:3}, {t:"🧔🏿‍♀️", v:0, w:11}, {t:"🧔🏽", v:0, w:11}]
 function animals(sea){
   let arr = sea ? seaArr : animalArr
 

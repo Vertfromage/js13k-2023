@@ -104,6 +104,8 @@
 [] Prices should go down sometimes?? could hardcode price changes??
 [] Shoot and kill sounds
 [] Talk
+[] buy medicine to heal members of caravan
+
 <!-- Cool but not necessary -->
 [x] Raiders mini game
 [x] Decentralized 
