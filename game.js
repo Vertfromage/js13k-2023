@@ -1,4 +1,4 @@
-// initialize 2D canvas (c)
+// initialize 2D canvas (c)Load
 // initialize game state (s)
 // initialize keys states (u,r,d,l for directions, k for all the keyboard)
 c = a.getContext`2d`, k = [u = r = d = l = s = 0]
@@ -292,12 +292,12 @@ function setButtons(){
         buttons[8].label=(buttons[8].label ==="Rest")? "Continue":"Rest"
         buttons[8].color= state==="moving" ? colors[0] : colors [1]
       }, colors[1]),
-      new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Shop!", [4], ()=>{
+      new Button(c.w*.5+2+bW*.5, mapH+bH+5, bW, bH, "Market!", [4], ()=>{
         if(state==='city'){
           s=3
           toggleTextContainer(false)
         }else{
-          alert("Can only visit shop in city!")
+          alert("Can only visit market in city!")
         }
       }),
       new Button(bCen, c.h*.7, bW, bH, "Overview!", [6], ()=>{
@@ -318,8 +318,8 @@ function setButtons(){
         flipSetting(12,["poor","good","filling"], "rations")
       }),
       new Button(c.w*.7, c.h*.55, bW*.7, bH*.7, playerData.settings["load"], [8], ()=>{
-        flipSetting(13,["light","medium","heavy"], "load")
-      }),
+        // flipSetting(13,["light","medium","heavy"], "load")
+      },colors[1]),
       new Button(c.w*.9, c.h*.3, bW/3, bH*.8, "⇧", [9], ()=>{
         lStart>0 && lStart-- && lEnd>5 && lEnd--
       }),
@@ -565,7 +565,7 @@ function statusPage(){
     tx(brownNum+" Mr.Brown NFTs", c.w*.02, c.h*.8, 2, colors[3], "left")
   }
 
-  tx(loadCalc()+" lbs per camel", c.w*.5, H+c.w*.05, 3, (overloaded ? "red" : colors[2]))
+  tx(loadCalc()+" lbs per camel", c.w*.8, H+c.w*.1, 2.5, (overloaded ? "red" : colors[2]))
 }
 
 const healthStatus = () =>{
@@ -1067,7 +1067,7 @@ function setEnemies(){
 
 // might need to modify if price goes up and down along the wayToDo 
 function shop(){
-  tx("Shop", c.w / 2, c.h * .1, 5.3, colors[3])
+  tx("Market", c.w / 2, c.h * .1, 5.3, colors[3])
   let H=c.h*.19, weight=0
   let supplies = playerData.supplies
   sum = 0
@@ -1099,6 +1099,7 @@ const loadCalc = ()=>{
     }
     weight = weight/(supplies["Camels"].n)<<0
     playerData.settings.load = weight<150 ? "light" : weight<250 ? "medium" : "heavy"
+    buttons[13].label = playerData.settings.load
     overloaded = weight>450
     return weight 
   }
@@ -1327,9 +1328,9 @@ const touch =(x1,y1,x2,y2, d) =>{
     a.style.top = `${(screenHeight - c.h) / 2}px`
 
     // reposition text container
-    textContainer.style.width = `${screenWidth}px`
+    textContainer.style.width = `100%`
     txtInput.style.marginTop = `${(txtInput.clientHeight - txtInput.clientHeight) / 2}px`
-
+    
     // Update arrow and arc positions and sizes based on canvas size
     arrow.x = c.w/2+c.w*.1
     arrow.y = c.h/2

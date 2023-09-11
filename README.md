@@ -1,7 +1,11 @@
 # Journey To The East
 # Silk Road Adventure 
-
 Embark on a journey along the Silk Road, making strategic decisions and overcoming challenges to successfully reach your destination in the East!
+
+Controls: click/tap
+Click on input to fill in members names
+
+The goal is to make it all the way across the silk road following the same path as Marco Polo. You will make decisions at each city market about what to buy and what to sell. Hunt along the way to save on food. Defend your caravan from marauders. Make careful decisions about load/speed/diet to maximize your end profit and keep as many members alive as possible. Refill your water skins at each city and random Oasis's.  
 
 # Decentralized Feature
 For my decentralized part I'm giving an advantage to anyone who has mr.brown nfts, if you login and have Mr.Brown nfts the first member of your caravan is Mr.Brown and he can't die or get sick based on random events only on bad decisions like running out of water or clothes. Also your end score is multiplied by how many mr.brown nfts you have.

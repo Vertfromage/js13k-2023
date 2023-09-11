@@ -2,7 +2,7 @@
 
 <!-- Mobile -->
 [] Resize is buggy when I implement full screen
-[] When mobile goes full screen resize is broken
+[] When mobile goes full screen resize is broken on some phones
 [] Not centered correctly on mobile
 
 <!-- Picky -->
@@ -97,14 +97,13 @@
 [x] ship sinks is a tiny chance on the first leg of journey
 [] technically you shouldn't die of anything other than ship wreck on first leg of journey
 [] pick up random member in a city... cool idea (remember we hard coded the party as 5 multiple times though...)
-[] How much camels can carry effects how much you can carry
-[] Talk
-[] Make load matter in game by making camels only carry a certain amount each
+[x] How much camels can carry effects how much you can carry
+[x] Make load matter in game by making camels only carry a certain amount each
 [] Lily refreshed by accident and lost progress... would need restart and local storage to fix this.
 [] kill animation
 [] Prices should go down sometimes?? could hardcode price changes??
 [] Shoot and kill sounds
-
+[] Talk
 <!-- Cool but not necessary -->
 [x] Raiders mini game
 [x] Decentralized 
