@@ -222,7 +222,6 @@ function setButtons(){
       //document.documentElement.requestFullscreen() //full screen by default
       // music
         musicPlay(0)
-
       }),
       new Button(c.w*.4, c.h*.7, bW, bH, "Back!", [1,8,9,10], ()=>{
         s=4
@@ -347,23 +346,24 @@ function setButtons(){
       )
   
   var H=c.h*.22
-  for(item in playerData.supplies){
+  var supplies = playerData.supplies
+  for(item in supplies){
     buttons.push(
       new Button(c.w * 0.7, H, 60, 30, "+", [3], (() => {
         const currentItem = item;
         return () => {
-          if(playerData.money - playerData.supplies[currentItem].cost >=0){
-            playerData.money -= playerData.supplies[currentItem].cost
-            playerData.supplies[currentItem].n+=playerData.supplies[currentItem].q
+          if(playerData.money - supplies[currentItem].cost >=0){
+            playerData.money -= supplies[currentItem].cost
+            supplies[currentItem].n+=supplies[currentItem].q
           }
         };
       })()),
       new Button(c.w * 0.78, H, 60, 30, "-", [3], (() => {
         const currentItem = item;
         return () => {
-          if(playerData.supplies[currentItem].n>=playerData.supplies[currentItem].q){
-            playerData.money += playerData.supplies[currentItem].cost
-            playerData.supplies[currentItem].n-=playerData.supplies[currentItem].q
+          if(supplies[currentItem].n>=supplies[currentItem].q){
+            playerData.money += supplies[currentItem].cost
+            supplies[currentItem].n-=supplies[currentItem].q
           }
         };
       })())
@@ -1108,8 +1108,9 @@ const loadCalc = ()=>{
 function score(){
   let sum=0
   // what the value is of all their supplies
+  let supplies = playerData.supplies
   for(item in playerData.supplies){
-    let value = playerData.supplies[item].n/playerData.supplies[item].q*playerData.supplies[item].cost << 0
+    let value = supplies[item].n/supplies[item].q*supplies[item].cost << 0
     sum+=value
   }
   playerData.score = (sum + playerData.money )*(5-playerData.dead)*(brownie?brownNum:1)
