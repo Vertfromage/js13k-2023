@@ -134,10 +134,13 @@ var latestEvent = ""
 var log=[]
 var currSong=0
 
+var music=0
 const musicStop = ()=>{
+  music=0
   p1``
 }
 const musicPlay = (c) =>{
+  music=1
   currSong=c
   if(c==0){
     p1`240.40
@@ -807,6 +810,7 @@ function memDied(){
       newEvent(who.k+" "+what+" and was lost.")
     }
     playerData.dead++
+    who.health = 0
     return 
   }
 
@@ -923,6 +927,7 @@ function animals(sea){
     if(an.v&& an.alive){
       c.textBaseline='middle'
       tx(an.t, an.x, an.y, 5.3, colors[3])
+      // drawKillBox(c, an.x, an.y, 27)
       c.textBaseline='alphabetic'
       an.y+=an.s
       if(an.y<10||an.y>c.h*.9){
@@ -941,6 +946,7 @@ function badGuys(){
     if(bg.v&& bg.alive){
       c.textBaseline='middle'
       tx(bg.t, bg.x, bg.y, 5.3, colors[3])
+      //drawKillBox(c, bg.x, bg.y, 25)
       c.textBaseline='alphabetic'
       bg.y+=bg.s
       if(bg.y<10||bg.y>c.h*.9){
@@ -1290,11 +1296,18 @@ function logs(start, end){
   buttons[15].active = end!==log.length 
 } 
 
-
-
 const touch =(x1,y1,x2,y2, d) =>{
   return Math.sqrt((x1 - x2)**2 + (y1 - y2)**2) < d
 }
+
+
+// const drawKillBox=(c, x,y, d)=>{
+//   c.beginPath()
+//   c.lineWidth = "6"
+//   c.strokeStyle = "red"
+//   c.rect(x-d/2, y-d/2, d, d)
+//   c.stroke()
+// }
 
   function setMouse(e){
     const canvasRect = a.getBoundingClientRect()
@@ -1344,6 +1357,7 @@ const touch =(x1,y1,x2,y2, d) =>{
     if(fullScreen){
       buttons[18].label="X"
       buttons[17].label= loggedIn ? "logout" : "login"
+      buttons[16].label= music ? "🔈":"🔇"
     }
   }
 

@@ -8,7 +8,9 @@
 <!-- Picky -->
 [] sometimes the wrong button gets set to inactive
 [] Going too fast too long should cause problems... 
+[] kill box
 
+[x] shouldn't say health = good if drowned
 [x] sound is dumb on mobile
 [x] remove and reset all testing bits
 [x] no hunting while at sea??Change animals.
